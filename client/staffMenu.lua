@@ -1,4 +1,5 @@
 local isMenuOpened, cat = false, "astrastaff"
+local prefix = "~r~[Astra]~s~"
 
 local function subCat(name)
     return cat..name
@@ -42,18 +43,17 @@ function openMenu()
     end
     menuOpen = true
 
-    RMenu.Add(cat, subCat("main"), RageUI.CreateMenu("Administration", nil, nil, nil, "tespascool", "interaction_bgd"))
+    RMenu.Add(cat, subCat("main"), RageUI.CreateMenu("Administration", "Menu administratif", nil, nil, "tespascool", "interaction_bgd"))
     RMenu:Get(cat, subCat("main")).Closed = function() end
 
-    RMenu.Add(cat, subCat("players"), RageUI.CreateSubMenu(RMenu:Get(cat, subCat("main")), nil, desc))
+    RMenu.Add(cat, subCat("players"), RageUI.CreateSubMenu(RMenu:Get(cat, subCat("main")), "Administration", "Menu administratif", nil, nil, "tespascool", "interaction_bgd"))
     RMenu:Get(cat, subCat("players")).Closed = function() end
 
-    RMenu.Add(cat, subCat("playersManage"), RageUI.CreateSubMenu(RMenu:Get(cat, subCat("players")), nil, desc))
+    RMenu.Add(cat, subCat("playersManage"), RageUI.CreateSubMenu(RMenu:Get(cat, subCat("players")), "Administration", "Menu administratif", nil, nil, "tespascool", "interaction_bgd"))
     RMenu:Get(cat, subCat("playersManage")).Closed = function() end
 
-    RMenu.Add(cat, subCat("vehicle"), RageUI.CreateSubMenu(RMenu:Get(cat, subCat("main")), nil, desc))
+    RMenu.Add(cat, subCat("vehicle"), RageUI.CreateSubMenu(RMenu:Get(cat, subCat("main")), "Administration", "Menu administratif", nil, nil, "tespascool", "interaction_bgd"))
     RMenu:Get(cat, subCat("vehicle")).Closed = function() end
-
 
 
     RageUI.Visible(RMenu:Get(cat, subCat("main")), true)

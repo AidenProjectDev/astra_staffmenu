@@ -26,9 +26,6 @@ end)
 RegisterNetEvent("astra_staff:cbPermLevel")
 AddEventHandler("astra_staff:cbPermLevel", function(pLvl)
     permLevel = pLvl
-    Citizen.SetTimeout(3500, function()
-        print("Salut mec")
-    end)
 end)
 
 Citizen.CreateThread(function()
