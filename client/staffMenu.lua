@@ -5,6 +5,10 @@ local function subCat(name)
     return cat..name
 end
 
+local function msg(string)
+    ESX.ShowNotification(string)
+end
+
 local function colorByState(bool)
     if bool then return "~g~" else return "~r~" end
 end
@@ -96,18 +100,6 @@ function openMenu()
                 end, RMenu:Get(cat, subCat("players")))
                 RageUI.ButtonWithStyle(cVarLong().."→ ~s~Gestion véhicules", nil, {RightLabel = "→→"}, true, function()
                 end, RMenu:Get(cat, subCat("vehicle")))
-
-                RageUI.Separator("↓ ~r~Administration ~s~↓")
-                RageUI.ButtonWithStyle(cVarLong().."→ ~s~Gestion du monde", nil, {RightLabel = "→→"}, true, function(_,_,s)
-                    if s then
-                        ESX.ShowNotification(prefix.."Cette fonctionalité est en développement")
-                    end
-                end)
-                RageUI.ButtonWithStyle(cVarLong().."→ ~s~Gestion du serveur", nil, {RightLabel = "→→"}, true, function(_,_,s)
-                    if s then
-                        ESX.ShowNotification(prefix.."Cette fonctionalité est en développement")
-                    end
-                end)
             end, function()
             end, 1)
 
@@ -116,7 +108,8 @@ function openMenu()
                 statsSeparator()
                 RageUI.Separator("↓ ~g~Joueurs ~s~↓")
                 for source, player in pairs(localPlayers) do
-                    RageUI.ButtonWithStyle(getRankDisplay(player.rank).."~s~[~o~"..source.."~s~] "..cVarLong().."→ ~s~"..player.name.." (~b~"..player.timePlayed[2].."h "..player.timePlayed[1].."min~s~)", nil, {RightLabel = "→→"}, source ~= GetPlayerServerId(PlayerId()) and ranksRelative[localPlayers[GetPlayerServerId(PlayerId())]] > ranksRelative[player.rank], function(_,_,s)
+                    --RageUI.ButtonWithStyle(getRankDisplay(player.rank).."~s~[~o~"..source.."~s~] "..cVarLong().."→ ~s~"..player.name.." (~b~"..player.timePlayed[2].."h "..player.timePlayed[1].."min~s~)", nil, {RightLabel = "→→"}, source ~= GetPlayerServerId(PlayerId()) and ranksRelative[localPlayers[GetPlayerServerId(PlayerId())]] > ranksRelative[player.rank], function(_,_,s)
+                    RageUI.ButtonWithStyle(getRankDisplay(player.rank).."~s~[~o~"..source.."~s~] "..cVarLong().."→ ~s~"..player.name.." (~b~"..player.timePlayed[2].."h "..player.timePlayed[1].."min~s~)", nil, {RightLabel = "→→"}, true, function(_,_,s)
                         if s then
                             selectedPlayer = id
                         end
@@ -166,12 +159,13 @@ function openMenu()
                             if IsModelValid(model) then
                                 RequestModel(model)
                                 while not HasModelLoaded(model) do Wait(1) end
-                                local veh = CreateVehicle(model, GetEntityCoords(PlayerPedId()), GetEntityHeading(PlayerPedId()), true, false)
-                                SetEntityAsMissionEntity(veh, 1, 1)
-                                SetModelAsNoLongerNeeded(model)
-                                if spawnInside then
-                                    TaskWarPlayerPedId()IntoVehicle(PlayerPedId(), veh, -1)
-                                end
+                                ESX.Game.SpawnVehicle(model, GetEntityCoords(PlayerPedId()), GetEntityHeading(PlayerPedId()), function(veh)
+                                    SetEntityAsMissionEntity(veh, 1, 1)
+                                    SetModelAsNoLongerNeeded(model)
+                                    if spawnInside then
+                                        TaskWarpPedIntoVehicle(PlayerPedId(), veh, -1)
+                                    end
+                                end)
                             else
                                 msg("Ce modèle n'existe pas")
                             end
