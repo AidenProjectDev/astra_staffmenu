@@ -2,7 +2,7 @@ isNoClip,NoClipSpeed = false,0.5
 spawnInside = false
 selectedPlayer = nil
 
-localPlayers, connecteds, staff = {},0,0
+localPlayers, connecteds, staff, items = {},0,0, {}
 permLevel = nil
 
 RegisterNetEvent("astra_staff:updatePlayers")
@@ -26,6 +26,11 @@ end)
 RegisterNetEvent("astra_staff:cbPermLevel")
 AddEventHandler("astra_staff:cbPermLevel", function(pLvl)
     permLevel = pLvl
+end)
+
+RegisterNetEvent("astra_staff:cbItemsList")
+AddEventHandler("astra_staff:cbItemsList", function(table)
+    items = table
 end)
 
 Citizen.CreateThread(function()

@@ -163,11 +163,9 @@ function CustomString()
     local txt = nil
     AddTextEntry("CREATOR_TXT", "Entrez votre texte.")
     DisplayOnscreenKeyboard(1, "CREATOR_TXT", '', "", '', '', '', 15)
-
     while UpdateOnscreenKeyboard() ~= 1 and UpdateOnscreenKeyboard() ~= 2 do
         Citizen.Wait(0)
     end
-
     if UpdateOnscreenKeyboard() ~= 2 then
         txt = GetOnscreenKeyboardResult()
         Citizen.Wait(1)
@@ -175,6 +173,32 @@ function CustomString()
         Citizen.Wait(1)
     end
     return txt
+end
+
+function input(TextEntry, ExampleText, MaxStringLenght, isValueInt)
+    AddTextEntry('FMMC_KEY_TIP1', TextEntry)
+    DisplayOnscreenKeyboard(1, "FMMC_KEY_TIP1", "", ExampleText, "", "", "", MaxStringLenght)
+    blockinput = true
+
+    while UpdateOnscreenKeyboard() ~= 1 and UpdateOnscreenKeyboard() ~= 2 do
+        Wait(0)
+    end
+
+    if UpdateOnscreenKeyboard() ~= 2 then
+        local result = GetOnscreenKeyboardResult()
+        Wait(500)
+        blockinput = false
+        if isValueInt then
+            local isNumber = tonumber(result)
+            if isNumber then return result else return nil end
+        end
+
+        return result
+    else
+        Wait(500)
+        blockinput = false
+        return nil
+    end
 end
 
 local function msg(string)

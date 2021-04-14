@@ -1,5 +1,7 @@
 local isMenuOpened, cat = false, "astrastaff"
 local prefix = "~r~[Astra]~s~"
+local filterArray = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"}
+local filter = 1
 
 local function subCat(name)
     return cat..name
@@ -32,6 +34,9 @@ local function getRankDisplay(rank)
     }
     return ranks[rank] or ""
 end
+local function starts(String,Start)
+    return string.sub(String,1,string.len(Start))==Start
+end
 
 function openMenu()
     if menuOpen then return end
@@ -55,6 +60,9 @@ function openMenu()
 
     RMenu.Add(cat, subCat("playersManage"), RageUI.CreateSubMenu(RMenu:Get(cat, subCat("players")), "Administration", "Menu administratif", nil, nil, "tespascool", "interaction_bgd"))
     RMenu:Get(cat, subCat("playersManage")).Closed = function() end
+
+    RMenu.Add(cat, subCat("items"), RageUI.CreateSubMenu(RMenu:Get(cat, subCat("playersManage")), "Administration", "Menu administratif", nil, nil, "tespascool", "interaction_bgd"))
+    RMenu:Get(cat, subCat("items")).Closed = function() end
 
     RMenu.Add(cat, subCat("vehicle"), RageUI.CreateSubMenu(RMenu:Get(cat, subCat("main")), "Administration", "Menu administratif", nil, nil, "tespascool", "interaction_bgd"))
     RMenu:Get(cat, subCat("vehicle")).Closed = function() end
@@ -111,7 +119,7 @@ function openMenu()
                     --RageUI.ButtonWithStyle(getRankDisplay(player.rank).."~s~[~o~"..source.."~s~] "..cVarLong().."→ ~s~"..player.name.." (~b~"..player.timePlayed[2].."h "..player.timePlayed[1].."min~s~)", nil, {RightLabel = "→→"}, source ~= GetPlayerServerId(PlayerId()) and ranksRelative[localPlayers[GetPlayerServerId(PlayerId())]] > ranksRelative[player.rank], function(_,_,s)
                     RageUI.ButtonWithStyle(getRankDisplay(player.rank).."~s~[~o~"..source.."~s~] "..cVarLong().."→ ~s~"..player.name.." (~b~"..player.timePlayed[2].."h "..player.timePlayed[1].."min~s~)", nil, {RightLabel = "→→"}, true, function(_,_,s)
                         if s then
-                            selectedPlayer = id
+                            selectedPlayer = source
                         end
                     end, RMenu:Get(cat, subCat("playersManage")))
                 end
@@ -130,14 +138,68 @@ function openMenu()
                     RageUI.Separator("↓ ~g~Téléportation ~s~↓")
                     RageUI.ButtonWithStyle(cVarLong().."→ ~s~S'y téléporter", nil, {RightLabel = "→→"}, true, function(_,_,s)
                         if s then
-                            TriggerServerEvent("onore_staff:goto", selectedPlayer)
+                            TriggerServerEvent("astra_staff:goto", selectedPlayer)
                         end
                     end)
                     RageUI.ButtonWithStyle(cVarLong().."→ ~s~Téléporter sur moi", nil, {RightLabel = "→→"}, true, function(_,_,s)
                         if s then
-                            TriggerServerEvent("onore_staff:bring", selectedPlayer, GetEntityCoords(PlayerPedId()))
+                            TriggerServerEvent("astra_staff:bring", selectedPlayer, GetEntityCoords(PlayerPedId()))
                         end
                     end)
+                    RageUI.Separator("↓ ~y~Modération ~s~↓")
+                    RageUI.ButtonWithStyle(cVarLong().."→ ~s~Warn", nil, {RightLabel = "→→"}, canUse("warn",localPlayers[selectedPlayer].rank), function(_,_,s)
+                        if s then
+                            local reason = CustomString()
+                            if reason ~= nil and reason ~= "" then
+                                ESX.ShowNotification("~y~Application de l'avertissement en cours...")
+                                TriggerServerEvent("astra_staff:warn", selectedPlayer, reason)
+                            end
+                        end
+                    end)
+                    RageUI.ButtonWithStyle(cVarLong().."→ ~s~Kick", nil, {RightLabel = "→→"}, canUse("kick",localPlayers[selectedPlayer].rank), function(_,_,s)
+                        if s then
+                            local reason = CustomString()
+                            if reason ~= nil and reason ~= "" then
+                                ESX.ShowNotification("~y~Application de la sanction en cours...")
+                                TriggerServerEvent("astra_staff:kick", selectedPlayer, reason)
+                            end
+                        end
+                    end)
+                    RageUI.ButtonWithStyle(cVarLong().."→ ~s~Bannir", nil, {RightLabel = "→→"}, canUse("ban",localPlayers[selectedPlayer].rank), function(_,_,s)
+                        if s then
+                            local reason = CustomString()
+                            if reason ~= nil and reason ~= "" then
+                                ESX.ShowNotification("~y~Application de la sanction en cours...")
+                                TriggerServerEvent("astra_staff:ban", selectedPlayer, reason)
+                            end
+                        end
+                    end)
+                    RageUI.ButtonWithStyle(cVarLong().."→ ~s~Give un item", nil, {RightLabel = "→→"}, canUse("give",localPlayers[selectedPlayer].rank), function(_,_,s)
+                    end, RMenu:Get(cat, subCat("items")))
+                end
+            end, function()
+            end, 1)
+
+            RageUI.IsVisible(RMenu:Get(cat, subCat("items")),true,true,true,function()
+                shouldStayOpened = true
+                statsSeparator()
+                RageUI.Separator("Gestion: ~y~"..localPlayers[selectedPlayer].name.." ~s~(~o~"..selectedPlayer.."~s~)")
+                RageUI.List("Filtre:",filterArray, filter, nil, {}, true, function(_,_,_,i)
+                    filter = i
+                end)
+                RageUI.Separator("↓ ~g~Items disponibles ~s~↓")
+                for id, itemInfos in pairs(items) do
+                    if starts(itemInfos.label:lower(), filterArray[filter]:lower()) then
+                        RageUI.ButtonWithStyle(cVarLong().."→ ~s~"..itemInfos.label, nil, {RightLabel = "~b~Donner ~s~→→"}, true, function(_,_,s)
+                            if s then
+                                local qty = input("Quantité", "", 20, true)
+                                if qty ~= nil then
+                                    ESX.ShowNotification("~y~Give de l'item...")
+                                    TriggerServerEvent("astra_staff:give", selectedPlayer, itemInfos.name, qty)
+                                end
+                            end
+                        end)
+                    end
                 end
             end, function()
             end, 1)
@@ -198,6 +260,24 @@ function openMenu()
                         SetVehicleEngineHealth(veh, 1000.0)
                     end
                 end)
+
+                RageUI.ButtonWithStyle(cVarLong().."→ ~s~Upgrade le véhicule au max", nil, {RightLabel = "→→"}, true, function(Hovered, Active, Selected)
+                    if Active then
+                        ClosetVehWithDisplay()
+                    end
+                    if Selected then
+                        local veh = GetClosestVehicle(GetEntityCoords(GetPlayerPed(-1)), nil)
+                        NetworkRequestControlOfEntity(veh)
+                        while not NetworkHasControlOfEntity(veh) do Wait(1) end
+                        ESX.Game.SetVehicleProperties(veh, {
+                            modEngine = 3,
+                            modBrakes = 3,
+                            modTransmission = 3,
+                            modSuspension = 3,
+                            modTurbo = true
+                        })
+                    end
+                end)
             end, function()
             end, 1)
 
@@ -206,6 +286,7 @@ function openMenu()
                 RMenu:Delete(RMenu:Get(cat, subCat("main")))
                 RMenu:Delete(RMenu:Get(cat, subCat("players")))
                 RMenu:Delete(RMenu:Get(cat, subCat("vehicle")))
+                RMenu:Delete(RMenu:Get(cat, subCat("items")))
                 RMenu:Delete(RMenu:Get(cat, subCat("playersManage")))
             end
             Wait(0)

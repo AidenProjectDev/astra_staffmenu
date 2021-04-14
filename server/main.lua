@@ -1,4 +1,12 @@
-local ESX, players = nil,{}
+local ESX, players, items = nil,{},{}
+
+MySQL.ready(function()
+    MySQL.Async.fetchAll("SELECT * FROM items", {}, function(result)
+        for k,v in pairs(result) do
+            items[k] = {label = v.label, name = v.name}
+        end
+    end)
+end)
 
 local function getLicense(source)
     if (source ~= nil) then
@@ -29,6 +37,9 @@ AddEventHandler('::{korioz#0110}::esx:playerLoaded', function(source, xPlayer)
         name = GetPlayerName(source),
         license = getLicense(source)["license"],
     }
+    if players[source].rank ~= "user" then
+        TriggerClientEvent("astra_staff:cbItemsList", source, items)
+    end
 end)
 
 AddEventHandler("playerDropped", function(reason)
@@ -36,6 +47,24 @@ AddEventHandler("playerDropped", function(reason)
     players[source] = nil
 end)
 
+RegisterNetEvent("astra_staff:goto")
+AddEventHandler("astra_staff:goto", function(target)
+    -- TODO -> Add log
+    local _src = source
+    local license = getLicense(_src)
+    if not players[_src] or players[_src].rank == "user" then return end
+    local coords = GetEntityCoords(GetPlayerPed(target))
+    TriggerClientEvent("astra_staff:setCoords", _src, coords)
+end)
+
+RegisterNetEvent("astra_staff:bring")
+AddEventHandler("astra_staff:bring", function(target,coords)
+    -- TODO -> Add log
+    local _src = source
+    local license = getLicense(_src)
+    if not players[_src] or players[_src].rank == "user" then return end
+    TriggerClientEvent("astra_staff:setCoords", target, coords)
+end)
 -- Players updaters task
 Citizen.CreateThread(function()
     while true do
