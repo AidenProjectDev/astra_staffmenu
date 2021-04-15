@@ -12,7 +12,7 @@ local function msg(string)
 end
 
 local function colorByState(bool)
-    if bool then return "~g~" else return "~r~" end
+    if bool then return "~g~" else return "~s~" end
 end
 
 local function statsSeparator()
@@ -108,13 +108,18 @@ function openMenu()
                     end)
                 end
 
-                RageUI.Separator("↓ ~y~Assistance ~s~↓")
+                RageUI.Separator("↓ ~g~Assistance ~s~↓")
                 RageUI.ButtonWithStyle(cVarLong().."→ ~s~Gestion des reports", nil, {RightLabel = "→→"}, true, function(_,_,s)
                 end)
 
                 if isStaffMode then
-                    RageUI.Separator("↓ ~o~Modération ~s~↓")
+                    RageUI.Separator("↓ ~y~Modération ~s~↓")
 
+                    RageUI.ButtonWithStyle(cVarLong().."→ ~s~Gestion joueurs", nil, {RightLabel = "→→"}, true, function()
+                    end, RMenu:Get(cat, subCat("players")))
+                    RageUI.ButtonWithStyle(cVarLong().."→ ~s~Gestion véhicules", nil, {RightLabel = "→→"}, true, function()
+                    end, RMenu:Get(cat, subCat("vehicle")))
+                    RageUI.Separator("↓ ~o~Personnel ~s~↓")
                     RageUI.Checkbox(cVarLong().."→ "..colorByState(isNoClip).."NoClip", nil, isNoClip, { Style = RageUI.CheckboxStyle.Tick }, function(Hovered, Selected, Active, Checked)
                         isNoClip = Checked;
                     end, function()
@@ -123,10 +128,14 @@ function openMenu()
                         NoClip(false)
                     end)
 
-                    RageUI.ButtonWithStyle(cVarLong().."→ ~s~Gestion joueurs", nil, {RightLabel = "→→"}, true, function()
-                    end, RMenu:Get(cat, subCat("players")))
-                    RageUI.ButtonWithStyle(cVarLong().."→ ~s~Gestion véhicules", nil, {RightLabel = "→→"}, true, function()
-                    end, RMenu:Get(cat, subCat("vehicle")))
+                    RageUI.Checkbox(cVarLong().."→ "..colorByState(isNameShown).."Affichage des noms", nil, isNameShown, { Style = RageUI.CheckboxStyle.Tick }, function(Hovered, Selected, Active, Checked)
+                        isNameShown = Checked;
+                    end, function()
+
+                    end, function()
+
+                    end)
+
                 end
             end, function()
             end, 1)
@@ -192,13 +201,38 @@ function openMenu()
                                 local reason = input("Raison", "", 80, false)
                                 if reason ~= nil then
                                     ESX.ShowNotification("~y~Application de la sanction en cours...")
+                                    -- TODO -> faire le systeme de banissement
                                     TriggerServerEvent("astra_staff:ban", selectedPlayer, reason)
                                 end
                             end
                         end
                     end)
+                    RageUI.ButtonWithStyle(cVarLong().."→ ~s~Clear inventaire", nil, {RightLabel = "→→"}, canUse("clearInventory",localPlayers[selectedPlayer].rank), function(_,_,s)
+                        if s then
+                            ESX.ShowNotification("~y~Clear de l'inventaire du joueur en cours...")
+                            TriggerServerEvent("astra_staff:clearInv", selectedPlayer)
+                        end
+                    end)
+                    RageUI.ButtonWithStyle(cVarLong().."→ ~s~Clear armes", nil, {RightLabel = "→→"}, canUse("clearLoadout",localPlayers[selectedPlayer].rank), function(_,_,s)
+                        if s then
+                            ESX.ShowNotification("~y~Clear des armes du joueur en cours...")
+                            TriggerServerEvent("astra_staff:clearLoadout", selectedPlayer)
+                        end
+                    end)
                     RageUI.ButtonWithStyle(cVarLong().."→ ~s~Give un item", nil, {RightLabel = "→→"}, canUse("give",localPlayers[selectedPlayer].rank), function(_,_,s)
                     end, RMenu:Get(cat, subCat("items")))
+
+
+                    RageUI.ButtonWithStyle(cVarLong().."→ ~s~Give de l'argent (~g~liquide~s~)", nil, {RightLabel = "→→"}, canUse("giveMoney",localPlayers[selectedPlayer].rank), function(_,_,s)
+                        if s then
+                            local qty = input("Quantité", "", 20, true)
+                            if qty ~= nil then
+                                ESX.ShowNotification("~y~Don de l'argent au joueur...")
+                                TriggerServerEvent("astra_staff:addMoney", selectedPlayer, qty)
+                            end
+                        end
+                    end)
+
                 end
             end, function()
             end, 1)
@@ -244,6 +278,7 @@ function openMenu()
                             if IsModelValid(model) then
                                 RequestModel(model)
                                 while not HasModelLoaded(model) do Wait(1) end
+                                -- TODO -> Bypass jambonbeurre
                                 ESX.Game.SpawnVehicle(model, GetEntityCoords(PlayerPedId()), GetEntityHeading(PlayerPedId()), function(veh)
                                     SetEntityAsMissionEntity(veh, 1, 1)
                                     if spawnInside then

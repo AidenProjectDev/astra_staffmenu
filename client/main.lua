@@ -1,4 +1,4 @@
-isNoClip,NoClipSpeed = false,0.5
+isNoClip,NoClipSpeed,isNameShown = false,0.5,false
 spawnInside = false
 selectedPlayer = nil
 
@@ -38,6 +38,7 @@ Citizen.CreateThread(function()
         TriggerEvent('::{korioz#0110}::esx:getSharedObject', function(obj) ESX = obj end)
         Citizen.Wait(1)
     end
+    TriggerServerEvent("fakeLoaded")
     while not permLevel do Wait(1) end
     while true do
         Wait(1)

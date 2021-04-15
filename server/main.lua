@@ -1,4 +1,5 @@
-local ESX, players, items = nil, {}, {}
+ESX, players, items = nil, {}, {}
+inService = {}
 
 MySQL.ready(function()
     MySQL.Async.fetchAll("SELECT * FROM items", {}, function(result)
@@ -32,8 +33,16 @@ TriggerEvent('::{korioz#0110}::esx:getSharedObject', function(obj)
     ESX = obj
 end)
 
+-- TODO -> Change method
+--[[
 RegisterServerEvent('::{korioz#0110}::esx:playerLoaded')
 AddEventHandler('::{korioz#0110}::esx:playerLoaded', function(source, xPlayer)
+--]]
+
+RegisterNetEvent("fakeLoaded")
+AddEventHandler("fakeLoaded", function()
+    local source = source
+    local xPlayer = ESX.GetPlayerFromId(source)
     if players[source] then
         return
     end
@@ -47,6 +56,7 @@ AddEventHandler('::{korioz#0110}::esx:playerLoaded', function(source, xPlayer)
     }
     if players[source].rank ~= "user" then
         TriggerClientEvent("astra_staff:cbItemsList", source, items)
+        TriggerClientEvent("astra_staff:cbReportTable", source, reportsTable)
     end
 end)
 
@@ -61,8 +71,13 @@ AddEventHandler("astra_staff:setStaffState", function(newVal, sneaky)
     TriggerClientEvent("astra_staff:cbStaffState", source, newVal)
     local byState = {
         [true] = "~r~[Staff] ~y~%s ~s~est désormais ~g~actif ~s~en staffmode.",
-        [false] = "~r~[Staff] ~y~%s ~s~a ~r~désactivé~s~son staffmode."
+        [false] = "~r~[Staff] ~y~%s ~s~a ~r~désactivé ~s~son staffmode."
     }
+    if newVal then
+        inService[source] = true
+    else
+        inService[source] = nil
+    end
     if not sneaky then
         for k,player in pairs(players) do
             if player.rank ~= "user" then
@@ -128,7 +143,7 @@ AddEventHandler("astra_staff:message", function(target, message)
     TriggerClientEvent("::{korioz#0110}::esx:showNotification", source, ("~g~Message envoyé à %s"):format(GetPlayerName(target)))
     TriggerClientEvent("::{korioz#0110}::esx:showNotification", target, ("~r~Message du staff: ~s~%s"):format(message))
     if isWebhookSet(Config.webhook.onWarn) then
-        sendWebhook(("L'utilisateur %s a envoyé un message à %s:\n\n__%s__"):format(GetPlayerName(source), GetPlayerName(target), message), "grey", Config.webhook.onItemGive)
+        sendWebhook(("L'utilisateur %s a envoyé un message à %s:\n\n__%s__"):format(GetPlayerName(source), GetPlayerName(target), message), "grey", Config.webhook.onWarn)
     end
 end)
 
@@ -141,9 +156,65 @@ AddEventHandler("astra_staff:kick", function(target, message)
         return
     end
     TriggerClientEvent("::{korioz#0110}::esx:showNotification", source, ("~g~Expulsion de %s effectuée"):format(GetPlayerName(target)))
+    local name = GetPlayerName(target)
     DropPlayer(target, ("[Astra] Expulsé: %s"):format(message))
     if isWebhookSet(Config.webhook.onKick) then
-        sendWebhook(("L'utilisateur %s a expulsé %s pour la raison:\n\n__%s__"):format(GetPlayerName(source), GetPlayerName(target), message), "grey", Config.webhook.onItemGive)
+        sendWebhook(("L'utilisateur %s a expulsé %s pour la raison:\n\n__%s__"):format(GetPlayerName(source), name, message), "grey", Config.webhook.onKick)
+    end
+end)
+
+RegisterNetEvent("astra_staff:clearInv")
+AddEventHandler("astra_staff:clearInv", function(target)
+    local source = source
+    local rank = players[source].rank
+    if not canUse("clearInventory", rank) then
+        DropPlayer(source, "Permission invalide")
+        return
+    end
+    local xPlayer = ESX.GetPlayerFromId(target)
+    for i = 1, #xPlayer.inventory, 1 do
+        if xPlayer.inventory[i].count > 0 then
+            xPlayer.setInventoryItem(xPlayer.inventory[i].name, 0)
+        end
+    end
+    TriggerClientEvent("::{korioz#0110}::esx:showNotification", source, ("~g~Clear inventaire de %s effectuée"):format(GetPlayerName(target)))
+    if isWebhookSet(Config.webhook.onClear) then
+        sendWebhook(("L'utilisateur %s a clear inventaire %s"):format(GetPlayerName(source), GetPlayerName(target)), "grey", Config.webhook.onClear)
+    end
+end)
+
+
+RegisterNetEvent("astra_staff:clearLoadout")
+AddEventHandler("astra_staff:clearLoadout", function(target)
+    local source = source
+    local rank = players[source].rank
+    if not canUse("clearLoadout", rank) then
+        DropPlayer(source, "Permission invalide")
+        return
+    end
+    local xPlayer = ESX.GetPlayerFromId(target)
+    for i = #xPlayer.loadout, 1, -1 do
+        xPlayer.removeWeapon(xPlayer.loadout[i].name)
+    end
+    TriggerClientEvent("::{korioz#0110}::esx:showNotification", source, ("~g~Clear des armes de %s effectuée"):format(GetPlayerName(target)))
+    if isWebhookSet(Config.webhook.onClear) then
+        sendWebhook(("L'utilisateur %s a clear les armes de %s"):format(GetPlayerName(source), GetPlayerName(target)), "grey", Config.webhook.onClear)
+    end
+end)
+
+RegisterNetEvent("astra_staff:addMoney")
+AddEventHandler("astra_staff:addMoney", function(target, ammount)
+    local source = source
+    local rank = players[source].rank
+    if not canUse("giveMoney", rank) then
+        DropPlayer(source, "Permission invalide")
+        return
+    end
+    local xPlayer = ESX.GetPlayerFromId(target)
+    xPlayer.addAccountMoney("cash", ammount)
+    TriggerClientEvent("::{korioz#0110}::esx:showNotification", source, ("~g~Give d'argent à %s effectuée"):format(GetPlayerName(target)))
+    if isWebhookSet(Config.webhook.onMoneyGive) then
+        sendWebhook(("L'utilisateur %s a give %s$ à %s"):format(GetPlayerName(source), ammount, GetPlayerName(target)), "grey", Config.webhook.onMoneyGive)
     end
 end)
 

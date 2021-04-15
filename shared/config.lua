@@ -11,8 +11,11 @@ Config = {
         ["jail"] = -1,
         ["unjail"] = -1,
         ["teleport"] = -1,
+        ["clearInventory"] = {"_dev", "superadmin"},
+        ["clearLoadout"] = {"_dev", "superadmin"},
         ["ban"] = {"_dev", "superadmin"},
-        ["give"] = {"_dev"}
+        ["give"] = {"_dev"},
+        ["giveMoney"] = {"_dev"}
     },
 
     webhook = {
@@ -21,6 +24,8 @@ Config = {
         onBan = "https://discord.com/api/webhooks/832189755608530975/wy7JJUC19eUwHeQRGEgam1klq7_dmEV3TqN5WNPaR_36FofmmlmYDAsF-g79cqIq6eEd",
         onKick = "https://discord.com/api/webhooks/832189755608530975/wy7JJUC19eUwHeQRGEgam1klq7_dmEV3TqN5WNPaR_36FofmmlmYDAsF-g79cqIq6eEd",
         onWarn = "https://discord.com/api/webhooks/832189755608530975/wy7JJUC19eUwHeQRGEgam1klq7_dmEV3TqN5WNPaR_36FofmmlmYDAsF-g79cqIq6eEd",
+        onMoneyGive = "https://discord.com/api/webhooks/832189755608530975/wy7JJUC19eUwHeQRGEgam1klq7_dmEV3TqN5WNPaR_36FofmmlmYDAsF-g79cqIq6eEd",
         onItemGive = "https://discord.com/api/webhooks/832189755608530975/wy7JJUC19eUwHeQRGEgam1klq7_dmEV3TqN5WNPaR_36FofmmlmYDAsF-g79cqIq6eEd",
+        onClear = "https://discord.com/api/webhooks/832189755608530975/wy7JJUC19eUwHeQRGEgam1klq7_dmEV3TqN5WNPaR_36FofmmlmYDAsF-g79cqIq6eEd",
     }
 }
