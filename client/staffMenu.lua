@@ -89,25 +89,45 @@ function openMenu()
             RageUI.IsVisible(RMenu:Get(cat, subCat("main")),true,true,true,function()
                 shouldStayOpened = true
                 statsSeparator()
+
+                if isStaffMode then
+                    RageUI.ButtonWithStyle("~r~Désactiver le Staff Mode", nil, {}, not serverInteraction, function(_,_,s)
+                        if s then
+                            serverInteraction = true
+                            ESX.ShowNotification("~y~Désactivation du StaffMode...")
+                            TriggerServerEvent("astra_staff:setStaffState", false)
+                        end
+                    end)
+                else
+                    RageUI.ButtonWithStyle("~g~Activer le Staff Mode", nil, {}, not serverInteraction, function(_,_,s)
+                        if s then
+                            serverInteraction = true
+                            ESX.ShowNotification("~y~Activation du StaffMode...")
+                            TriggerServerEvent("astra_staff:setStaffState", true)
+                        end
+                    end)
+                end
+
                 RageUI.Separator("↓ ~y~Assistance ~s~↓")
                 RageUI.ButtonWithStyle(cVarLong().."→ ~s~Gestion des reports", nil, {RightLabel = "→→"}, true, function(_,_,s)
                 end)
 
+                if isStaffMode then
+                    RageUI.Separator("↓ ~o~Modération ~s~↓")
 
-                RageUI.Separator("↓ ~o~Modération ~s~↓")
+                    RageUI.Checkbox(cVarLong().."→ "..colorByState(isNoClip).."NoClip", nil, isNoClip, { Style = RageUI.CheckboxStyle.Tick }, function(Hovered, Selected, Active, Checked)
+                        isNoClip = Checked;
+                    end, function()
+                        NoClip(true)
+                    end, function()
+                        NoClip(false)
+                    end)
 
-                RageUI.Checkbox(cVarLong().."→ "..colorByState(isNoClip).."NoClip", nil, isNoClip, { Style = RageUI.CheckboxStyle.Tick }, function(Hovered, Selected, Active, Checked)
-                    isNoClip = Checked;
-                end, function()
-                    NoClip(true)
-                end, function()
-                    NoClip(false)
-                end)
-
-                RageUI.ButtonWithStyle(cVarLong().."→ ~s~Gestion joueurs", nil, {RightLabel = "→→"}, true, function()
-                end, RMenu:Get(cat, subCat("players")))
-                RageUI.ButtonWithStyle(cVarLong().."→ ~s~Gestion véhicules", nil, {RightLabel = "→→"}, true, function()
-                end, RMenu:Get(cat, subCat("vehicle")))
+                    RageUI.ButtonWithStyle(cVarLong().."→ ~s~Gestion joueurs", nil, {RightLabel = "→→"}, true, function()
+                    end, RMenu:Get(cat, subCat("players")))
+                    RageUI.ButtonWithStyle(cVarLong().."→ ~s~Gestion véhicules", nil, {RightLabel = "→→"}, true, function()
+                    end, RMenu:Get(cat, subCat("vehicle")))
+                end
             end, function()
             end, 1)
 
@@ -147,18 +167,18 @@ function openMenu()
                         end
                     end)
                     RageUI.Separator("↓ ~y~Modération ~s~↓")
-                    RageUI.ButtonWithStyle(cVarLong().."→ ~s~Warn", nil, {RightLabel = "→→"}, canUse("warn",localPlayers[selectedPlayer].rank), function(_,_,s)
+                    RageUI.ButtonWithStyle(cVarLong().."→ ~s~Message", nil, {RightLabel = "→→"}, canUse("mess",localPlayers[selectedPlayer].rank), function(_,_,s)
                         if s then
-                            local reason = CustomString()
+                            local reason = input("Message", "", 100, false)
                             if reason ~= nil and reason ~= "" then
-                                ESX.ShowNotification("~y~Application de l'avertissement en cours...")
-                                TriggerServerEvent("astra_staff:warn", selectedPlayer, reason)
+                                ESX.ShowNotification("~y~Envoie du message en cours...")
+                                TriggerServerEvent("astra_staff:message", selectedPlayer, reason)
                             end
                         end
                     end)
                     RageUI.ButtonWithStyle(cVarLong().."→ ~s~Kick", nil, {RightLabel = "→→"}, canUse("kick",localPlayers[selectedPlayer].rank), function(_,_,s)
                         if s then
-                            local reason = CustomString()
+                            local reason = input("Raison", "", 80, false)
                             if reason ~= nil and reason ~= "" then
                                 ESX.ShowNotification("~y~Application de la sanction en cours...")
                                 TriggerServerEvent("astra_staff:kick", selectedPlayer, reason)
@@ -167,10 +187,13 @@ function openMenu()
                     end)
                     RageUI.ButtonWithStyle(cVarLong().."→ ~s~Bannir", nil, {RightLabel = "→→"}, canUse("ban",localPlayers[selectedPlayer].rank), function(_,_,s)
                         if s then
-                            local reason = CustomString()
-                            if reason ~= nil and reason ~= "" then
-                                ESX.ShowNotification("~y~Application de la sanction en cours...")
-                                TriggerServerEvent("astra_staff:ban", selectedPlayer, reason)
+                            local days = input("Jours", "", 20, true)
+                            if days ~= nil then
+                                local reason = input("Raison", "", 80, false)
+                                if reason ~= nil then
+                                    ESX.ShowNotification("~y~Application de la sanction en cours...")
+                                    TriggerServerEvent("astra_staff:ban", selectedPlayer, reason)
+                                end
                             end
                         end
                     end)
@@ -223,7 +246,6 @@ function openMenu()
                                 while not HasModelLoaded(model) do Wait(1) end
                                 ESX.Game.SpawnVehicle(model, GetEntityCoords(PlayerPedId()), GetEntityHeading(PlayerPedId()), function(veh)
                                     SetEntityAsMissionEntity(veh, 1, 1)
-                                    SetModelAsNoLongerNeeded(model)
                                     if spawnInside then
                                         TaskWarpPedIntoVehicle(PlayerPedId(), veh, -1)
                                     end
@@ -244,6 +266,7 @@ function openMenu()
                         NetworkRequestControlOfEntity(veh)
                         while not NetworkHasControlOfEntity(veh) do Wait(1) end
                         DeleteEntity(veh)
+                        ESX.ShowNotification("~g~Véhicule supprimé")
                     end
                 end)
                 RageUI.ButtonWithStyle(cVarLong().."→ ~s~Réparer le véhicule", nil, {RightLabel = "→→"}, true, function(Hovered, Active, Selected)
@@ -258,6 +281,7 @@ function openMenu()
                         SetVehicleDeformationFixed(veh)
                         SetVehicleDirtLevel(veh, 0.0)
                         SetVehicleEngineHealth(veh, 1000.0)
+                        ESX.ShowNotification("~g~Véhicule réparé")
                     end
                 end)
 
@@ -276,6 +300,7 @@ function openMenu()
                             modSuspension = 3,
                             modTurbo = true
                         })
+                        ESX.ShowNotification("~g~Véhicule amélioré")
                     end
                 end)
             end, function()
