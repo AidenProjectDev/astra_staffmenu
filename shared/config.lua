@@ -14,6 +14,7 @@ Config = {
         ["clearInventory"] = {"_dev", "superadmin"},
         ["clearLoadout"] = {"_dev", "superadmin"},
         ["ban"] = {"_dev", "superadmin"},
+        ["setGroup"] = {"_dev", "superadmin"},
         ["give"] = {"_dev"},
         ["giveMoney"] = {"_dev"}
     },
@@ -27,5 +28,6 @@ Config = {
         onMoneyGive = "https://discord.com/api/webhooks/832189755608530975/wy7JJUC19eUwHeQRGEgam1klq7_dmEV3TqN5WNPaR_36FofmmlmYDAsF-g79cqIq6eEd",
         onItemGive = "https://discord.com/api/webhooks/832189755608530975/wy7JJUC19eUwHeQRGEgam1klq7_dmEV3TqN5WNPaR_36FofmmlmYDAsF-g79cqIq6eEd",
         onClear = "https://discord.com/api/webhooks/832189755608530975/wy7JJUC19eUwHeQRGEgam1klq7_dmEV3TqN5WNPaR_36FofmmlmYDAsF-g79cqIq6eEd",
+        onGroupChange = "https://discord.com/api/webhooks/832189755608530975/wy7JJUC19eUwHeQRGEgam1klq7_dmEV3TqN5WNPaR_36FofmmlmYDAsF-g79cqIq6eEd"
     }
 }

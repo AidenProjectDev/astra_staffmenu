@@ -125,10 +125,14 @@ AddEventHandler("astra_staff:give", function(target, itemName, qty)
         return
     end
     local xPlayer = ESX.GetPlayerFromId(tonumber(target))
-    xPlayer.addInventoryItem(itemName, tonumber(qty))
-    TriggerClientEvent("::{korioz#0110}::esx:showNotification", source, ("~g~Give de %sx%s au joueur %s effectué"):format(qty, itemName, GetPlayerName(target)))
-    if isWebhookSet(Config.webhook.onItemGive) then
-        sendWebhook(("L'utilisateur %s a give %sx%s a %s"):format(GetPlayerName(source), qty, itemName, GetPlayerName(target)), "grey", Config.webhook.onItemGive)
+    if xPlayer then
+        xPlayer.addInventoryItem(itemName, tonumber(qty))
+        TriggerClientEvent("::{korioz#0110}::esx:showNotification", source, ("~g~Give de %sx%s au joueur %s effectué"):format(qty, itemName, GetPlayerName(target)))
+        if isWebhookSet(Config.webhook.onItemGive) then
+            sendWebhook(("L'utilisateur %s a give %sx%s a %s"):format(GetPlayerName(source), qty, itemName, GetPlayerName(target)), "grey", Config.webhook.onItemGive)
+        end
+    else
+        TriggerClientEvent("::{korioz#0110}::esx:showNotification", source, "~r~Ce joueur n'est plus connecté")
     end
 end)
 
@@ -141,7 +145,7 @@ AddEventHandler("astra_staff:message", function(target, message)
         return
     end
     TriggerClientEvent("::{korioz#0110}::esx:showNotification", source, ("~g~Message envoyé à %s"):format(GetPlayerName(target)))
-    TriggerClientEvent("::{korioz#0110}::esx:showNotification", target, ("~r~Message du staff: ~s~%s"):format(message))
+    TriggerClientEvent("::{korioz#0110}::esx:showNotification", target, ("~r~Message du staff~s~: %s"):format(message))
     if isWebhookSet(Config.webhook.onWarn) then
         sendWebhook(("L'utilisateur %s a envoyé un message à %s:\n\n__%s__"):format(GetPlayerName(source), GetPlayerName(target), message), "grey", Config.webhook.onWarn)
     end
@@ -160,6 +164,35 @@ AddEventHandler("astra_staff:kick", function(target, message)
     DropPlayer(target, ("[Astra] Expulsé: %s"):format(message))
     if isWebhookSet(Config.webhook.onKick) then
         sendWebhook(("L'utilisateur %s a expulsé %s pour la raison:\n\n__%s__"):format(GetPlayerName(source), name, message), "grey", Config.webhook.onKick)
+    end
+end)
+
+RegisterNetEvent("astra_staff:setGroup")
+AddEventHandler("astra_staff:setGroup", function(target, group)
+    local source = source
+    local rank = players[source].rank
+    if not canUse("setGroup", rank) then
+        DropPlayer(source, "Permission invalide")
+        return
+    end
+    local xPlayer = ESX.GetPlayerFromId(target)
+    if xPlayer then
+        xPlayer.setGroup(group)
+        ESX.SavePlayer(xPlayer, function() end)
+        players[source].rank = group
+        TriggerClientEvent("astra_staff:cbPermLevel", target, group)
+        TriggerClientEvent("::{korioz#0110}::esx:showNotification", source, ("~g~Changement du rang de %s effectué"):format(GetPlayerName(target)))
+        for source, player in pairs(players) do
+            if isStaff(source) then
+                TriggerClientEvent("astra_staff:updatePlayers", source, players)
+            end
+        end
+        local name = GetPlayerName(target)
+        if isWebhookSet(Config.webhook.onGroupChange) then
+            sendWebhook(("L'utilisateur %s a changé le groupe de %s pour le groupe: __%s__"):format(GetPlayerName(source), name, group), "red", Config.webhook.onGroupChange)
+        end
+    else
+        TriggerClientEvent("::{korioz#0110}::esx:showNotification", source, "~r~Ce joueur n'est plus connecté")
     end
 end)
 

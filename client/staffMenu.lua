@@ -20,10 +20,17 @@ local function statsSeparator()
 end
 
 local ranksRelative = {
-    ["user"] = 4,
-    ["admin"] = 3,
-    ["superadmin"] = 2,
-    ["_dev"] = 1
+    ["user"] = 1,
+    ["admin"] = 2,
+    ["superadmin"] = 3,
+    ["_dev"] = 4
+}
+
+local ranksInfos = {
+    [1] = {label = "Joueur", rank = "user"},
+    [2] = {label = "Admin", rank = "admin"},
+    [3] = {label = "Super Admin", rank = "superadmin"},
+    [4] = {label = "Développeur", rank = "_dev"}
 }
 
 local function getRankDisplay(rank)
@@ -60,6 +67,9 @@ function openMenu()
 
     RMenu.Add(cat, subCat("playersManage"), RageUI.CreateSubMenu(RMenu:Get(cat, subCat("players")), "Administration", "Menu administratif", nil, nil, "tespascool", "interaction_bgd"))
     RMenu:Get(cat, subCat("playersManage")).Closed = function() end
+
+    RMenu.Add(cat, subCat("setGroup"), RageUI.CreateSubMenu(RMenu:Get(cat, subCat("playersManage")), "Administration", "Menu administratif", nil, nil, "tespascool", "interaction_bgd"))
+    RMenu:Get(cat, subCat("setGroup")).Closed = function() end
 
     RMenu.Add(cat, subCat("items"), RageUI.CreateSubMenu(RMenu:Get(cat, subCat("playersManage")), "Administration", "Menu administratif", nil, nil, "tespascool", "interaction_bgd"))
     RMenu:Get(cat, subCat("items")).Closed = function() end
@@ -196,17 +206,19 @@ function openMenu()
                     end)
                     RageUI.ButtonWithStyle(cVarLong().."→ ~s~Bannir", nil, {RightLabel = "→→"}, canUse("ban",localPlayers[selectedPlayer].rank), function(_,_,s)
                         if s then
-                            local days = input("Jours", "", 20, true)
+                            local days = input("Durée du banissement (en heures)", "", 20, true)
                             if days ~= nil then
                                 local reason = input("Raison", "", 80, false)
                                 if reason ~= nil then
                                     ESX.ShowNotification("~y~Application de la sanction en cours...")
-                                    -- TODO -> faire le systeme de banissement
-                                    TriggerServerEvent("astra_staff:ban", selectedPlayer, reason)
+                                    ExecuteCommand(("sqlban %s %s %s"):format(selectedPlayer, days, reason))
                                 end
                             end
                         end
                     end)
+                    RageUI.ButtonWithStyle(cVarLong().."→ ~s~Changer le groupe", nil, {RightLabel = "→→"}, canUse("setGroup",localPlayers[selectedPlayer].rank), function(_,_,s)
+                    end, RMenu:Get(cat, subCat("setGroup")))
+                    RageUI.Separator("↓ ~o~Personnage ~s~↓")
                     RageUI.ButtonWithStyle(cVarLong().."→ ~s~Clear inventaire", nil, {RightLabel = "→→"}, canUse("clearInventory",localPlayers[selectedPlayer].rank), function(_,_,s)
                         if s then
                             ESX.ShowNotification("~y~Clear de l'inventaire du joueur en cours...")
@@ -219,9 +231,9 @@ function openMenu()
                             TriggerServerEvent("astra_staff:clearLoadout", selectedPlayer)
                         end
                     end)
+
                     RageUI.ButtonWithStyle(cVarLong().."→ ~s~Give un item", nil, {RightLabel = "→→"}, canUse("give",localPlayers[selectedPlayer].rank), function(_,_,s)
                     end, RMenu:Get(cat, subCat("items")))
-
 
                     RageUI.ButtonWithStyle(cVarLong().."→ ~s~Give de l'argent (~g~liquide~s~)", nil, {RightLabel = "→→"}, canUse("giveMoney",localPlayers[selectedPlayer].rank), function(_,_,s)
                         if s then
@@ -257,6 +269,22 @@ function openMenu()
                             end
                         end)
                     end
+                end
+            end, function()
+            end, 1)
+
+            RageUI.IsVisible(RMenu:Get(cat, subCat("setGroup")),true,true,true,function()
+                shouldStayOpened = true
+                statsSeparator()
+                RageUI.Separator("Gestion: ~y~"..localPlayers[selectedPlayer].name.." ~s~(~o~"..selectedPlayer.."~s~)")
+                RageUI.Separator("↓ ~g~Rangs disponibles ~s~↓")
+                for i = 1,#ranksInfos do
+                    RageUI.ButtonWithStyle(cVarLong().."→ ~s~"..ranksInfos[i].label, nil, {RightLabel = "~b~Attribuer ~s~→→"}, ranksRelative[permLevel] > i, function(_,_,s)
+                        if s then
+                            ESX.ShowNotification("~y~Application du rang...")
+                            TriggerServerEvent("astra_staff:setGroup", selectedPlayer, ranksInfos[i].rank)
+                        end
+                    end)
                 end
             end, function()
             end, 1)
@@ -346,6 +374,7 @@ function openMenu()
                 RMenu:Delete(RMenu:Get(cat, subCat("main")))
                 RMenu:Delete(RMenu:Get(cat, subCat("players")))
                 RMenu:Delete(RMenu:Get(cat, subCat("vehicle")))
+                RMenu:Delete(RMenu:Get(cat, subCat("setGroup")))
                 RMenu:Delete(RMenu:Get(cat, subCat("items")))
                 RMenu:Delete(RMenu:Get(cat, subCat("playersManage")))
             end
