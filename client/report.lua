@@ -6,6 +6,7 @@ end
 
 RegisterNetEvent("astra_staff:cbReportTable")
 AddEventHandler("astra_staff:cbReportTable", function(table)
+    -- TODO -> Add a sound when report taken
     reportCount = 0
     take = 0
     for source,report in pairs(table) do

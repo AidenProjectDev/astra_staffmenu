@@ -186,6 +186,7 @@ function openMenu()
                         NoClip(false)
                     end)
 
+                    -- TODO -> Faire avec les DecorSetInt le grade du joueur et faire les couleurs avec les mpGamerTag
                     RageUI.Checkbox(cVarLong() .. "→ " .. colorByState(isNameShown) .. "Affichage des noms", nil, isNameShown, { Style = RageUI.CheckboxStyle.Tick }, function(Hovered, Selected, Active, Checked)
                         isNameShown = Checked;
                     end, function()

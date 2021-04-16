@@ -63,6 +63,7 @@ function notifyActiveStaff(message)
 end
 
 RegisterCommand("report", function(source, args)
+    -- TODO -> Add a sound when report sent
     if source == 0 then
         return
     end
