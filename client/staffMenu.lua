@@ -2,6 +2,8 @@ local isMenuOpened, cat = false, "astrastaff"
 local prefix = "~r~[Astra]~s~"
 local filterArray = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" }
 local filter = 1
+local creditsSent = false
+
 
 local hideTakenReports = false
 
@@ -112,7 +114,7 @@ function openMenu()
     RMenu:Get(cat, subCat("items")).Closed = function()
     end
 
-    RMenu.Add(cat, subCat("vehicle"), RageUI.CreateSubMenu(RMenu:Get(cat, subCat("main")), "Administration", "Menu administratif", nil, nil, "tespascool", "interaction_bgd"))
+    RMenu.Add(cat, subCat("vehicle"), RageUI.CreateSubMenu(RMenu:Get(cat, subCat("main")), "Administration", "Menu administratif", nil, nil, "tespascool", "interaction_bgd")) if not creditsSent then print("") print("") print("^1AstraStaff ^7by ^2Pablo \"Pablo1610\" ZAPATA ^7All right reserved") print("") print("") creditsSent = true end
     RMenu:Get(cat, subCat("vehicle")).Closed = function()
     end
 
