@@ -1,4 +1,7 @@
 function canUse(permission, playerRank)
+    if playerRank == "user" then
+        return false
+    end
     if type(Config.authorizations[permission]) ~= "table" then
         return true
     end

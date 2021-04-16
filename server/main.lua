@@ -57,12 +57,15 @@ AddEventHandler("fakeLoaded", function()
     if players[source].rank ~= "user" then
         TriggerClientEvent("astra_staff:cbItemsList", source, items)
         TriggerClientEvent("astra_staff:cbReportTable", source, reportsTable)
+        TriggerClientEvent("astra_staff:updatePlayers", source, players)
     end
 end)
 
 AddEventHandler("playerDropped", function(reason)
     local source = source
     players[source] = nil
+    reportsTable[source] = nil
+    updateReportsForStaff()
 end)
 
 RegisterNetEvent("astra_staff:setStaffState")
@@ -80,7 +83,7 @@ AddEventHandler("astra_staff:setStaffState", function(newVal, sneaky)
     end
     if not sneaky then
         for k,player in pairs(players) do
-            if player.rank ~= "user" then
+            if player.rank ~= "user" and inService[k] ~= nil then
                 TriggerClientEvent("::{korioz#0110}::esx:showNotification", k, byState[newVal]:format(GetPlayerName(source)))
             end
         end
@@ -116,6 +119,18 @@ AddEventHandler("astra_staff:bring", function(target, coords)
     end
 end)
 
+RegisterNetEvent("astra_staff:tppc")
+AddEventHandler("astra_staff:tppc", function(target, coords)
+    local source = source
+    local rank = players[source].rank
+    if not canUse("tppc", rank) then
+        DropPlayer(source, "Permission invalide")
+        return
+    end
+    TriggerClientEvent("astra_staff:setCoords", target, vector3(215.76, -810.12, 30.73))
+    TriggerClientEvent("::{korioz#0110}::esx:showNotification", source, "~g~Téléportation effectuée")
+end)
+
 RegisterNetEvent("astra_staff:give")
 AddEventHandler("astra_staff:give", function(target, itemName, qty)
     local source = source
@@ -146,8 +161,8 @@ AddEventHandler("astra_staff:message", function(target, message)
     end
     TriggerClientEvent("::{korioz#0110}::esx:showNotification", source, ("~g~Message envoyé à %s"):format(GetPlayerName(target)))
     TriggerClientEvent("::{korioz#0110}::esx:showNotification", target, ("~r~Message du staff~s~: %s"):format(message))
-    if isWebhookSet(Config.webhook.onWarn) then
-        sendWebhook(("L'utilisateur %s a envoyé un message à %s:\n\n__%s__"):format(GetPlayerName(source), GetPlayerName(target), message), "grey", Config.webhook.onWarn)
+    if isWebhookSet(Config.webhook.onMessage) then
+        sendWebhook(("L'utilisateur %s a envoyé un message à %s:\n\n__%s__"):format(GetPlayerName(source), GetPlayerName(target), message), "grey", Config.webhook.onMessage)
     end
 end)
 
@@ -164,6 +179,53 @@ AddEventHandler("astra_staff:kick", function(target, message)
     DropPlayer(target, ("[Astra] Expulsé: %s"):format(message))
     if isWebhookSet(Config.webhook.onKick) then
         sendWebhook(("L'utilisateur %s a expulsé %s pour la raison:\n\n__%s__"):format(GetPlayerName(source), name, message), "grey", Config.webhook.onKick)
+    end
+end)
+
+RegisterNetEvent("astra_staff:revive")
+AddEventHandler("astra_staff:revive", function(target)
+    local source = source
+    local rank = players[source].rank
+    if not canUse("revive", rank) then
+        DropPlayer(source, "Permission invalide")
+        return
+    end
+    TriggerClientEvent("::{korioz#0110}::esx:showNotification", source, ("~g~Revive de %s effectué"):format(GetPlayerName(target)))
+    TriggerClientEvent("::{korioz#0110}::esx_ambulancejob:revive", target)
+    local name = GetPlayerName(target)
+    if isWebhookSet(Config.webhook.onRevive) then
+        sendWebhook(("L'utilisateur %s a revive %s"):format(GetPlayerName(source), name), "grey", Config.webhook.onRevive)
+    end
+end)
+
+RegisterNetEvent("astra_staff:heal")
+AddEventHandler("astra_staff:heal", function(target)
+    local source = source
+    local rank = players[source].rank
+    if not canUse("heal", rank) then
+        DropPlayer(source, "Permission invalide")
+        return
+    end
+    TriggerClientEvent("::{korioz#0110}::esx:showNotification", source, ("~g~Heal de %s effectué"):format(GetPlayerName(target)))
+    TriggerClientEvent('::{korioz#0110}::esx_status:healPlayer', target)
+    local name = GetPlayerName(target)
+    if isWebhookSet(Config.webhook.onHeal) then
+        sendWebhook(("L'utilisateur %s a heal %s"):format(GetPlayerName(source), name), "grey", Config.webhook.onHeal)
+    end
+end)
+
+RegisterNetEvent("astra_staff:spawnVehicle")
+AddEventHandler("astra_staff:spawnVehicle", function(model, target)
+    local source = source
+    local rank = players[source].rank
+    if not canUse("vehicles", rank) then
+        DropPlayer(source, "Permission invalide")
+        return
+    end
+    if target ~= nil then
+        TriggerClientEvent("::{korioz#0110}::esx:spawnVehicle", target, model)
+    else
+        TriggerClientEvent("::{korioz#0110}::esx:spawnVehicle", source, model)
     end
 end)
 

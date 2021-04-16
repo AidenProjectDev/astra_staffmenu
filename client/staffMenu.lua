@@ -1,10 +1,12 @@
 local isMenuOpened, cat = false, "astrastaff"
 local prefix = "~r~[Astra]~s~"
-local filterArray = {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"}
+local filterArray = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" }
 local filter = 1
 
+local hideTakenReports = false
+
 local function subCat(name)
-    return cat..name
+    return cat .. name
 end
 
 local function msg(string)
@@ -12,11 +14,23 @@ local function msg(string)
 end
 
 local function colorByState(bool)
-    if bool then return "~g~" else return "~s~" end
+    if bool then
+        return "~g~"
+    else
+        return "~s~"
+    end
 end
 
 local function statsSeparator()
-    RageUI.Separator("Connectés: ~g~"..connecteds.." ~b~|~s~ Staff en ligne: ~o~"..staff)
+    RageUI.Separator("Connectés: ~g~" .. connecteds .. " ~b~|~s~ Staff en ligne: ~o~" .. staff)
+end
+
+local function generateTakenBy(reportID)
+    if localReportsTable[reportID].taken then
+        return "~s~ | Pris par: ~o~" .. localReportsTable[reportID].takenBy
+    else
+        return ""
+    end
 end
 
 local ranksRelative = {
@@ -27,10 +41,10 @@ local ranksRelative = {
 }
 
 local ranksInfos = {
-    [1] = {label = "Joueur", rank = "user"},
-    [2] = {label = "Admin", rank = "admin"},
-    [3] = {label = "Super Admin", rank = "superadmin"},
-    [4] = {label = "Développeur", rank = "_dev"}
+    [1] = { label = "Joueur", rank = "user" },
+    [2] = { label = "Admin", rank = "admin" },
+    [3] = { label = "Super Admin", rank = "superadmin" },
+    [4] = { label = "Développeur", rank = "_dev" }
 }
 
 local function getRankDisplay(rank)
@@ -41,18 +55,29 @@ local function getRankDisplay(rank)
     }
     return ranks[rank] or ""
 end
-local function starts(String,Start)
-    return string.sub(String,1,string.len(Start))==Start
+
+local function getIsTakenDisplay(bool)
+    if bool then
+        return ""
+    else
+        return "~r~[EN ATTENTE]~s~ "
+    end
+end
+
+local function starts(String, Start)
+    return string.sub(String, 1, string.len(Start)) == Start
 end
 
 function openMenu()
-    if menuOpen then return end
+    if menuOpen then
+        return
+    end
     if permLevel == "user" then
         ESX.ShowNotification("~r~Vous n'avez pas accès à ce menu.")
         return
     end
     local selectedColor = 1
-    local cVarLongC = {"~p~", "~r~","~o~","~y~","~c~","~g~","~b~"}
+    local cVarLongC = { "~p~", "~r~", "~o~", "~y~", "~c~", "~g~", "~b~" }
     local cVar1, cVar2 = "~y~", "~r~"
     local cVarLong = function()
         return cVarLongC[selectedColor]
@@ -60,48 +85,71 @@ function openMenu()
     menuOpen = true
 
     RMenu.Add(cat, subCat("main"), RageUI.CreateMenu("Administration", "Menu administratif", nil, nil, "tespascool", "interaction_bgd"))
-    RMenu:Get(cat, subCat("main")).Closed = function() end
+    RMenu:Get(cat, subCat("main")).Closed = function()
+    end
 
     RMenu.Add(cat, subCat("players"), RageUI.CreateSubMenu(RMenu:Get(cat, subCat("main")), "Administration", "Menu administratif", nil, nil, "tespascool", "interaction_bgd"))
-    RMenu:Get(cat, subCat("players")).Closed = function() end
+    RMenu:Get(cat, subCat("players")).Closed = function()
+    end
+
+    RMenu.Add(cat, subCat("reports"), RageUI.CreateSubMenu(RMenu:Get(cat, subCat("main")), "Administration", "Menu administratif", nil, nil, "tespascool", "interaction_bgd"))
+    RMenu:Get(cat, subCat("reports")).Closed = function()
+    end
+
+    RMenu.Add(cat, subCat("reports_take"), RageUI.CreateSubMenu(RMenu:Get(cat, subCat("reports")), "Administration", "Menu administratif", nil, nil, "tespascool", "interaction_bgd"))
+    RMenu:Get(cat, subCat("reports_take")).Closed = function()
+    end
 
     RMenu.Add(cat, subCat("playersManage"), RageUI.CreateSubMenu(RMenu:Get(cat, subCat("players")), "Administration", "Menu administratif", nil, nil, "tespascool", "interaction_bgd"))
-    RMenu:Get(cat, subCat("playersManage")).Closed = function() end
+    RMenu:Get(cat, subCat("playersManage")).Closed = function()
+    end
 
     RMenu.Add(cat, subCat("setGroup"), RageUI.CreateSubMenu(RMenu:Get(cat, subCat("playersManage")), "Administration", "Menu administratif", nil, nil, "tespascool", "interaction_bgd"))
-    RMenu:Get(cat, subCat("setGroup")).Closed = function() end
+    RMenu:Get(cat, subCat("setGroup")).Closed = function()
+    end
 
     RMenu.Add(cat, subCat("items"), RageUI.CreateSubMenu(RMenu:Get(cat, subCat("playersManage")), "Administration", "Menu administratif", nil, nil, "tespascool", "interaction_bgd"))
-    RMenu:Get(cat, subCat("items")).Closed = function() end
+    RMenu:Get(cat, subCat("items")).Closed = function()
+    end
 
     RMenu.Add(cat, subCat("vehicle"), RageUI.CreateSubMenu(RMenu:Get(cat, subCat("main")), "Administration", "Menu administratif", nil, nil, "tespascool", "interaction_bgd"))
-    RMenu:Get(cat, subCat("vehicle")).Closed = function() end
-
+    RMenu:Get(cat, subCat("vehicle")).Closed = function()
+    end
 
     RageUI.Visible(RMenu:Get(cat, subCat("main")), true)
     Citizen.CreateThread(function()
         while menuOpen do
             Wait(800)
-            if cVar1 == "~y~" then cVar1 = "~o~" else cVar1 = "~y~" end
-            if cVar2 == "~r~" then cVar2 = "~s~" else cVar2 = "~r~" end
+            if cVar1 == "~y~" then
+                cVar1 = "~o~"
+            else
+                cVar1 = "~y~"
+            end
+            if cVar2 == "~r~" then
+                cVar2 = "~s~"
+            else
+                cVar2 = "~r~"
+            end
         end
     end)
     Citizen.CreateThread(function()
         while menuOpen do
             Wait(250)
             selectedColor = selectedColor + 1
-            if selectedColor > #cVarLongC then selectedColor = 1 end
+            if selectedColor > #cVarLongC then
+                selectedColor = 1
+            end
         end
     end)
     Citizen.CreateThread(function()
         while menuOpen do
             local shouldStayOpened = false
-            RageUI.IsVisible(RMenu:Get(cat, subCat("main")),true,true,true,function()
+            RageUI.IsVisible(RMenu:Get(cat, subCat("main")), true, true, true, function()
                 shouldStayOpened = true
                 statsSeparator()
 
                 if isStaffMode then
-                    RageUI.ButtonWithStyle("~r~Désactiver le Staff Mode", nil, {}, not serverInteraction, function(_,_,s)
+                    RageUI.ButtonWithStyle("~r~Désactiver le Staff Mode", nil, {}, not serverInteraction, function(_, _, s)
                         if s then
                             serverInteraction = true
                             ESX.ShowNotification("~y~Désactivation du StaffMode...")
@@ -109,7 +157,7 @@ function openMenu()
                         end
                     end)
                 else
-                    RageUI.ButtonWithStyle("~g~Activer le Staff Mode", nil, {}, not serverInteraction, function(_,_,s)
+                    RageUI.ButtonWithStyle("~g~Activer le Staff Mode", nil, {}, not serverInteraction, function(_, _, s)
                         if s then
                             serverInteraction = true
                             ESX.ShowNotification("~y~Activation du StaffMode...")
@@ -119,18 +167,18 @@ function openMenu()
                 end
 
                 RageUI.Separator("↓ ~g~Assistance ~s~↓")
-                RageUI.ButtonWithStyle(cVarLong().."→ ~s~Gestion des reports", nil, {RightLabel = "→→"}, true, function(_,_,s)
-                end)
+                RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Gestion des reports (~r~" .. reportCount .. "~s~)", nil, { RightLabel = "→→" }, isStaffMode, function(_, _, s)
+                end, RMenu:Get(cat, subCat("reports")))
 
                 if isStaffMode then
                     RageUI.Separator("↓ ~y~Modération ~s~↓")
 
-                    RageUI.ButtonWithStyle(cVarLong().."→ ~s~Gestion joueurs", nil, {RightLabel = "→→"}, true, function()
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Gestion joueurs", nil, { RightLabel = "→→" }, true, function()
                     end, RMenu:Get(cat, subCat("players")))
-                    RageUI.ButtonWithStyle(cVarLong().."→ ~s~Gestion véhicules", nil, {RightLabel = "→→"}, true, function()
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Gestion véhicules", nil, { RightLabel = "→→" }, true, function()
                     end, RMenu:Get(cat, subCat("vehicle")))
                     RageUI.Separator("↓ ~o~Personnel ~s~↓")
-                    RageUI.Checkbox(cVarLong().."→ "..colorByState(isNoClip).."NoClip", nil, isNoClip, { Style = RageUI.CheckboxStyle.Tick }, function(Hovered, Selected, Active, Checked)
+                    RageUI.Checkbox(cVarLong() .. "→ " .. colorByState(isNoClip) .. "NoClip", nil, isNoClip, { Style = RageUI.CheckboxStyle.Tick }, function(Hovered, Selected, Active, Checked)
                         isNoClip = Checked;
                     end, function()
                         NoClip(true)
@@ -138,7 +186,7 @@ function openMenu()
                         NoClip(false)
                     end)
 
-                    RageUI.Checkbox(cVarLong().."→ "..colorByState(isNameShown).."Affichage des noms", nil, isNameShown, { Style = RageUI.CheckboxStyle.Tick }, function(Hovered, Selected, Active, Checked)
+                    RageUI.Checkbox(cVarLong() .. "→ " .. colorByState(isNameShown) .. "Affichage des noms", nil, isNameShown, { Style = RageUI.CheckboxStyle.Tick }, function(Hovered, Selected, Active, Checked)
                         isNameShown = Checked;
                     end, function()
 
@@ -150,13 +198,13 @@ function openMenu()
             end, function()
             end, 1)
 
-            RageUI.IsVisible(RMenu:Get(cat, subCat("players")),true,true,true,function()
+            RageUI.IsVisible(RMenu:Get(cat, subCat("players")), true, true, true, function()
                 shouldStayOpened = true
                 statsSeparator()
                 RageUI.Separator("↓ ~g~Joueurs ~s~↓")
                 for source, player in pairs(localPlayers) do
                     --RageUI.ButtonWithStyle(getRankDisplay(player.rank).."~s~[~o~"..source.."~s~] "..cVarLong().."→ ~s~"..player.name.." (~b~"..player.timePlayed[2].."h "..player.timePlayed[1].."min~s~)", nil, {RightLabel = "→→"}, source ~= GetPlayerServerId(PlayerId()) and ranksRelative[localPlayers[GetPlayerServerId(PlayerId())]] > ranksRelative[player.rank], function(_,_,s)
-                    RageUI.ButtonWithStyle(getRankDisplay(player.rank).."~s~[~o~"..source.."~s~] "..cVarLong().."→ ~s~"..player.name.." (~b~"..player.timePlayed[2].."h "..player.timePlayed[1].."min~s~)", nil, {RightLabel = "→→"}, true, function(_,_,s)
+                    RageUI.ButtonWithStyle(getRankDisplay(player.rank) .. "~s~[~o~" .. source .. "~s~] " .. cVarLong() .. "→ ~s~" .. player.name .. " (~b~" .. player.timePlayed[2] .. "h " .. player.timePlayed[1] .. "min~s~)", nil, { RightLabel = "→→" }, true, function(_, _, s)
                         if s then
                             selectedPlayer = source
                         end
@@ -165,28 +213,123 @@ function openMenu()
             end, function()
             end, 1)
 
-            RageUI.IsVisible(RMenu:Get(cat, subCat("playersManage")),true,true,true,function()
+            RageUI.IsVisible(RMenu:Get(cat, subCat("reports")), true, true, true, function()
+                shouldStayOpened = true
+                statsSeparator()
+                RageUI.Separator("↓ ~g~Paramètres ~s~↓")
+                RageUI.Checkbox(colorByState(hideTakenReports) .. "Cacher les pris en charge", nil, hideTakenReports, { Style = RageUI.CheckboxStyle.Tick }, function(Hovered, Selected, Active, Checked)
+                    hideTakenReports = Checked;
+                end, function()
+                end, function()
+                end)
+                RageUI.Separator("↓ ~y~Reports ~s~↓")
+                for sender, infos in pairs(localReportsTable) do
+                    if infos.taken then
+                        if hideTakenReports == false then
+                            RageUI.ButtonWithStyle(getIsTakenDisplay(infos.taken) .. "[~b~" .. infos.id .. "~s~] " .. cVarLong() .. "→ ~s~" .. infos.name, "~b~ID Unique~s~: #" .. infos.id .. "~n~~y~Description~s~: " .. infos.reason .. "~n~~o~Pris en charge par~s~: " .. infos.takenBy, { RightLabel = "→→" }, true, function(_, _, s)
+                                if s then
+                                    selectedReport = sender
+                                end
+                            end, RMenu:Get(cat, subCat("reports_take")))
+                        end
+                    else
+                        RageUI.ButtonWithStyle(getIsTakenDisplay(infos.taken) .. "[~b~" .. infos.id .. "~s~] " .. cVarLong() .. "→ ~s~" .. infos.name, "~b~ID Unique~s~: #" .. infos.id .. "~n~~y~Description~s~: " .. infos.reason, { RightLabel = "→→" }, true, function(_, _, s)
+                            if s then
+                                selectedReport = sender
+                            end
+                        end, RMenu:Get(cat, subCat("reports_take")))
+                    end
+                end
+            end, function()
+            end, 1)
+
+            RageUI.IsVisible(RMenu:Get(cat, subCat("reports_take")), true, true, true, function()
+                shouldStayOpened = true
+                statsSeparator()
+                if localReportsTable[selectedReport] ~= nil then
+                    RageUI.Separator("ID du Report: ~b~#" .. localReportsTable[selectedReport].uniqueId .. " ~s~| ID de l'auteur: ~y~" .. selectedReport .. generateTakenBy(selectedReport))
+                    RageUI.Separator("↓ ~g~Actions sur le report ~s~↓")
+                    local infos = localReportsTable[selectedReport]
+                    if not localReportsTable[selectedReport].taken then
+                        RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Prendre en charge ce report", "~y~Description~s~: " .. infos.reason, { RightLabel = "→→" }, true, function(_, _, s)
+                            if s then
+                                TriggerServerEvent("astra_staff:takeReport", selectedReport)
+                            end
+                        end)
+                    end
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Cloturer ce report", "~y~Description~s~: " .. infos.reason, { RightLabel = "→→" }, true, function(_, _, s)
+                        if s then
+                            TriggerServerEvent("astra_staff:closeReport", selectedReport)
+                        end
+                    end)
+                    RageUI.Separator("↓ ~y~Actions rapides ~s~↓")
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Revive", "~y~Description~s~: " .. infos.reason, { RightLabel = "→→" }, canUse("revive", localPlayers[selectedReport].rank), function(_, _, s)
+                        if s then
+                            ESX.ShowNotification("~y~Revive du joueur en cours...")
+                            TriggerServerEvent("astra_staff:revive", selectedReport)
+                        end
+                    end)
+
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Soigner", "~y~Description~s~: " .. infos.reason, { RightLabel = "→→" }, canUse("revive", localPlayers[selectedReport].rank), function(_, _, s)
+                        if s then
+                            ESX.ShowNotification("~y~Heal du joueur en cours...")
+                            TriggerServerEvent("astra_staff:heal", selectedReport)
+                        end
+                    end)
+
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~TP sur lui", nil, { RightLabel = "→→" }, true, function(_, _, s)
+                        if s then
+                            TriggerServerEvent("astra_staff:goto", selectedReport)
+                        end
+                    end)
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~TP sur moi", nil, { RightLabel = "→→" }, true, function(_, _, s)
+                        if s then
+                            TriggerServerEvent("astra_staff:bring", selectedReport, GetEntityCoords(PlayerPedId()))
+                        end
+                    end)
+
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~TP Parking Central", "~y~Description~s~: " .. infos.reason, { RightLabel = "→→" }, canUse("tppc", localPlayers[selectedReport].rank), function(_, _, s)
+                        if s then
+                            ESX.ShowNotification("~y~Téléportation du joueur en cours...")
+                            TriggerServerEvent("astra_staff:tppc", selectedReport)
+                        end
+                    end)
+
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~y~Actions avancées", "~y~Description~s~: " .. infos.reason.."~n~~r~Attention~s~: Cette action vous fera changer de menu", { RightLabel = "→→" }, canUse("tppc", localPlayers[selectedReport].rank), function(_, _, s)
+                        if s then
+                            selectedPlayer = selectedReport
+                        end
+                    end,RMenu:Get(cat,subCat("playersManage")))
+                else
+                    RageUI.Separator("")
+                    RageUI.Separator(cVar2 .. "Ce report n'est plus valide")
+                    RageUI.Separator("")
+                end
+            end, function()
+            end, 1)
+
+            RageUI.IsVisible(RMenu:Get(cat, subCat("playersManage")), true, true, true, function()
                 shouldStayOpened = true
                 if not localPlayers[selectedPlayer] then
                     RageUI.Separator("")
-                    RageUI.Separator(cVar2.."Ce joueur n'est plus connecté !")
+                    RageUI.Separator(cVar2 .. "Ce joueur n'est plus connecté !")
                     RageUI.Separator("")
                 else
                     statsSeparator()
-                    RageUI.Separator("Gestion: ~y~"..localPlayers[selectedPlayer].name.." ~s~(~o~"..selectedPlayer.."~s~)")
+                    RageUI.Separator("Gestion: ~y~" .. localPlayers[selectedPlayer].name .. " ~s~(~o~" .. selectedPlayer .. "~s~)")
                     RageUI.Separator("↓ ~g~Téléportation ~s~↓")
-                    RageUI.ButtonWithStyle(cVarLong().."→ ~s~S'y téléporter", nil, {RightLabel = "→→"}, true, function(_,_,s)
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~S'y téléporter", nil, { RightLabel = "→→" }, true, function(_, _, s)
                         if s then
                             TriggerServerEvent("astra_staff:goto", selectedPlayer)
                         end
                     end)
-                    RageUI.ButtonWithStyle(cVarLong().."→ ~s~Téléporter sur moi", nil, {RightLabel = "→→"}, true, function(_,_,s)
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Téléporter sur moi", nil, { RightLabel = "→→" }, true, function(_, _, s)
                         if s then
                             TriggerServerEvent("astra_staff:bring", selectedPlayer, GetEntityCoords(PlayerPedId()))
                         end
                     end)
                     RageUI.Separator("↓ ~y~Modération ~s~↓")
-                    RageUI.ButtonWithStyle(cVarLong().."→ ~s~Message", nil, {RightLabel = "→→"}, canUse("mess",localPlayers[selectedPlayer].rank), function(_,_,s)
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Message", nil, { RightLabel = "→→" }, canUse("mess", localPlayers[selectedPlayer].rank), function(_, _, s)
                         if s then
                             local reason = input("Message", "", 100, false)
                             if reason ~= nil and reason ~= "" then
@@ -195,7 +338,7 @@ function openMenu()
                             end
                         end
                     end)
-                    RageUI.ButtonWithStyle(cVarLong().."→ ~s~Kick", nil, {RightLabel = "→→"}, canUse("kick",localPlayers[selectedPlayer].rank), function(_,_,s)
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Kick", nil, { RightLabel = "→→" }, canUse("kick", localPlayers[selectedPlayer].rank), function(_, _, s)
                         if s then
                             local reason = input("Raison", "", 80, false)
                             if reason ~= nil and reason ~= "" then
@@ -204,7 +347,7 @@ function openMenu()
                             end
                         end
                     end)
-                    RageUI.ButtonWithStyle(cVarLong().."→ ~s~Bannir", nil, {RightLabel = "→→"}, canUse("ban",localPlayers[selectedPlayer].rank), function(_,_,s)
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Bannir", nil, { RightLabel = "→→" }, canUse("ban", localPlayers[selectedPlayer].rank), function(_, _, s)
                         if s then
                             local days = input("Durée du banissement (en heures)", "", 20, true)
                             if days ~= nil then
@@ -216,26 +359,59 @@ function openMenu()
                             end
                         end
                     end)
-                    RageUI.ButtonWithStyle(cVarLong().."→ ~s~Changer le groupe", nil, {RightLabel = "→→"}, canUse("setGroup",localPlayers[selectedPlayer].rank), function(_,_,s)
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Changer le groupe", nil, { RightLabel = "→→" }, canUse("setGroup", localPlayers[selectedPlayer].rank), function(_, _, s)
                     end, RMenu:Get(cat, subCat("setGroup")))
                     RageUI.Separator("↓ ~o~Personnage ~s~↓")
-                    RageUI.ButtonWithStyle(cVarLong().."→ ~s~Clear inventaire", nil, {RightLabel = "→→"}, canUse("clearInventory",localPlayers[selectedPlayer].rank), function(_,_,s)
+
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Revive", nil, { RightLabel = "→→" }, canUse("revive", localPlayers[selectedPlayer].rank), function(_, _, s)
+                        if s then
+                            ESX.ShowNotification("~y~Revive du joueur en cours...")
+                            TriggerServerEvent("astra_staff:revive", selectedPlayer)
+                        end
+                    end)
+
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Soigner", nil, { RightLabel = "→→" }, canUse("revive", localPlayers[selectedPlayer].rank), function(_, _, s)
+                        if s then
+                            ESX.ShowNotification("~y~Heal du joueur en cours...")
+                            TriggerServerEvent("astra_staff:heal", selectedPlayer)
+                        end
+                    end)
+
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Donner un véhicule", nil, { RightLabel = "→→" }, canUse("vehicles", localPlayers[selectedPlayer].rank), function(Hovered, Active, Selected)
+                        if Selected then
+                            local veh = CustomString()
+                            if veh ~= nil then
+                                local model = GetHashKey(veh)
+                                if IsModelValid(model) then
+                                    RequestModel(model)
+                                    while not HasModelLoaded(model) do
+                                        Wait(1)
+                                    end
+                                    TriggerServerEvent("astra_staff:spawnVehicle", model, selectedPlayer)
+                                else
+                                    msg("Ce modèle n'existe pas")
+                                end
+                            end
+                        end
+                    end)
+
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Clear inventaire", nil, { RightLabel = "→→" }, canUse("clearInventory", localPlayers[selectedPlayer].rank), function(_, _, s)
                         if s then
                             ESX.ShowNotification("~y~Clear de l'inventaire du joueur en cours...")
                             TriggerServerEvent("astra_staff:clearInv", selectedPlayer)
                         end
                     end)
-                    RageUI.ButtonWithStyle(cVarLong().."→ ~s~Clear armes", nil, {RightLabel = "→→"}, canUse("clearLoadout",localPlayers[selectedPlayer].rank), function(_,_,s)
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Clear armes", nil, { RightLabel = "→→" }, canUse("clearLoadout", localPlayers[selectedPlayer].rank), function(_, _, s)
                         if s then
                             ESX.ShowNotification("~y~Clear des armes du joueur en cours...")
                             TriggerServerEvent("astra_staff:clearLoadout", selectedPlayer)
                         end
                     end)
 
-                    RageUI.ButtonWithStyle(cVarLong().."→ ~s~Give un item", nil, {RightLabel = "→→"}, canUse("give",localPlayers[selectedPlayer].rank), function(_,_,s)
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Give un item", nil, { RightLabel = "→→" }, canUse("give", localPlayers[selectedPlayer].rank), function(_, _, s)
                     end, RMenu:Get(cat, subCat("items")))
 
-                    RageUI.ButtonWithStyle(cVarLong().."→ ~s~Give de l'argent (~g~liquide~s~)", nil, {RightLabel = "→→"}, canUse("giveMoney",localPlayers[selectedPlayer].rank), function(_,_,s)
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Give de l'argent (~g~liquide~s~)", nil, { RightLabel = "→→" }, canUse("giveMoney", localPlayers[selectedPlayer].rank), function(_, _, s)
                         if s then
                             local qty = input("Quantité", "", 20, true)
                             if qty ~= nil then
@@ -249,17 +425,17 @@ function openMenu()
             end, function()
             end, 1)
 
-            RageUI.IsVisible(RMenu:Get(cat, subCat("items")),true,true,true,function()
+            RageUI.IsVisible(RMenu:Get(cat, subCat("items")), true, true, true, function()
                 shouldStayOpened = true
                 statsSeparator()
-                RageUI.Separator("Gestion: ~y~"..localPlayers[selectedPlayer].name.." ~s~(~o~"..selectedPlayer.."~s~)")
-                RageUI.List("Filtre:",filterArray, filter, nil, {}, true, function(_,_,_,i)
+                RageUI.Separator("Gestion: ~y~" .. localPlayers[selectedPlayer].name .. " ~s~(~o~" .. selectedPlayer .. "~s~)")
+                RageUI.List("Filtre:", filterArray, filter, nil, {}, true, function(_, _, _, i)
                     filter = i
                 end)
                 RageUI.Separator("↓ ~g~Items disponibles ~s~↓")
                 for id, itemInfos in pairs(items) do
                     if starts(itemInfos.label:lower(), filterArray[filter]:lower()) then
-                        RageUI.ButtonWithStyle(cVarLong().."→ ~s~"..itemInfos.label, nil, {RightLabel = "~b~Donner ~s~→→"}, true, function(_,_,s)
+                        RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~" .. itemInfos.label, nil, { RightLabel = "~b~Donner ~s~→→" }, true, function(_, _, s)
                             if s then
                                 local qty = input("Quantité", "", 20, true)
                                 if qty ~= nil then
@@ -273,13 +449,13 @@ function openMenu()
             end, function()
             end, 1)
 
-            RageUI.IsVisible(RMenu:Get(cat, subCat("setGroup")),true,true,true,function()
+            RageUI.IsVisible(RMenu:Get(cat, subCat("setGroup")), true, true, true, function()
                 shouldStayOpened = true
                 statsSeparator()
-                RageUI.Separator("Gestion: ~y~"..localPlayers[selectedPlayer].name.." ~s~(~o~"..selectedPlayer.."~s~)")
+                RageUI.Separator("Gestion: ~y~" .. localPlayers[selectedPlayer].name .. " ~s~(~o~" .. selectedPlayer .. "~s~)")
                 RageUI.Separator("↓ ~g~Rangs disponibles ~s~↓")
-                for i = 1,#ranksInfos do
-                    RageUI.ButtonWithStyle(cVarLong().."→ ~s~"..ranksInfos[i].label, nil, {RightLabel = "~b~Attribuer ~s~→→"}, ranksRelative[permLevel] > i, function(_,_,s)
+                for i = 1, #ranksInfos do
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~" .. ranksInfos[i].label, nil, { RightLabel = "~b~Attribuer ~s~→→" }, ranksRelative[permLevel] > i, function(_, _, s)
                         if s then
                             ESX.ShowNotification("~y~Application du rang...")
                             TriggerServerEvent("astra_staff:setGroup", selectedPlayer, ranksInfos[i].rank)
@@ -289,30 +465,21 @@ function openMenu()
             end, function()
             end, 1)
 
-            RageUI.IsVisible(RMenu:Get(cat, subCat("vehicle")),true,true,true,function()
+            RageUI.IsVisible(RMenu:Get(cat, subCat("vehicle")), true, true, true, function()
                 shouldStayOpened = true
                 statsSeparator()
                 RageUI.Separator("↓ ~g~Apparition ~s~↓")
-                RageUI.Checkbox(cVarLong().."→ "..colorByState(spawnInside).."Spawn dedans", nil, spawnInside, { Style = RageUI.CheckboxStyle.Tick }, function(Hovered, Selected, Active, Checked)
-                    spawnInside = Checked;
-                end, function()
-                end, function()
-                end)
-                RageUI.ButtonWithStyle(cVarLong().."→ ~s~Spawn un véhicule", nil, {RightLabel = "→→"}, true, function(Hovered, Active, Selected)
+                RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Spawn un véhicule", nil, { RightLabel = "→→" }, true, function(Hovered, Active, Selected)
                     if Selected then
                         local veh = CustomString()
                         if veh ~= nil then
                             local model = GetHashKey(veh)
                             if IsModelValid(model) then
                                 RequestModel(model)
-                                while not HasModelLoaded(model) do Wait(1) end
-                                -- TODO -> Bypass jambonbeurre
-                                ESX.Game.SpawnVehicle(model, GetEntityCoords(PlayerPedId()), GetEntityHeading(PlayerPedId()), function(veh)
-                                    SetEntityAsMissionEntity(veh, 1, 1)
-                                    if spawnInside then
-                                        TaskWarpPedIntoVehicle(PlayerPedId(), veh, -1)
-                                    end
-                                end)
+                                while not HasModelLoaded(model) do
+                                    Wait(1)
+                                end
+                                TriggerServerEvent("astra_staff:spawnVehicle", model)
                             else
                                 msg("Ce modèle n'existe pas")
                             end
@@ -320,26 +487,30 @@ function openMenu()
                     end
                 end)
                 RageUI.Separator("↓ ~y~Gestion ~s~↓")
-                RageUI.ButtonWithStyle(cVarLong().."→ ~s~Supprimer le véhicule", nil, {RightLabel = "→→"}, true, function(Hovered, Active, Selected)
+                RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Supprimer le véhicule", nil, { RightLabel = "→→" }, true, function(Hovered, Active, Selected)
                     if Active then
                         ClosetVehWithDisplay()
                     end
                     if Selected then
                         local veh = GetClosestVehicle(GetEntityCoords(GetPlayerPed(-1)), nil)
                         NetworkRequestControlOfEntity(veh)
-                        while not NetworkHasControlOfEntity(veh) do Wait(1) end
+                        while not NetworkHasControlOfEntity(veh) do
+                            Wait(1)
+                        end
                         DeleteEntity(veh)
                         ESX.ShowNotification("~g~Véhicule supprimé")
                     end
                 end)
-                RageUI.ButtonWithStyle(cVarLong().."→ ~s~Réparer le véhicule", nil, {RightLabel = "→→"}, true, function(Hovered, Active, Selected)
+                RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Réparer le véhicule", nil, { RightLabel = "→→" }, true, function(Hovered, Active, Selected)
                     if Active then
                         ClosetVehWithDisplay()
                     end
                     if Selected then
                         local veh = GetClosestVehicle(GetEntityCoords(GetPlayerPed(-1)), nil)
                         NetworkRequestControlOfEntity(veh)
-                        while not NetworkHasControlOfEntity(veh) do Wait(1) end
+                        while not NetworkHasControlOfEntity(veh) do
+                            Wait(1)
+                        end
                         SetVehicleFixed(veh)
                         SetVehicleDeformationFixed(veh)
                         SetVehicleDirtLevel(veh, 0.0)
@@ -348,14 +519,16 @@ function openMenu()
                     end
                 end)
 
-                RageUI.ButtonWithStyle(cVarLong().."→ ~s~Upgrade le véhicule au max", nil, {RightLabel = "→→"}, true, function(Hovered, Active, Selected)
+                RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Upgrade le véhicule au max", nil, { RightLabel = "→→" }, true, function(Hovered, Active, Selected)
                     if Active then
                         ClosetVehWithDisplay()
                     end
                     if Selected then
                         local veh = GetClosestVehicle(GetEntityCoords(GetPlayerPed(-1)), nil)
                         NetworkRequestControlOfEntity(veh)
-                        while not NetworkHasControlOfEntity(veh) do Wait(1) end
+                        while not NetworkHasControlOfEntity(veh) do
+                            Wait(1)
+                        end
                         ESX.Game.SetVehicleProperties(veh, {
                             modEngine = 3,
                             modBrakes = 3,
@@ -373,6 +546,8 @@ function openMenu()
                 menuOpen = false
                 RMenu:Delete(RMenu:Get(cat, subCat("main")))
                 RMenu:Delete(RMenu:Get(cat, subCat("players")))
+                RMenu:Delete(RMenu:Get(cat, subCat("reports")))
+                RMenu:Delete(RMenu:Get(cat, subCat("reports_take")))
                 RMenu:Delete(RMenu:Get(cat, subCat("vehicle")))
                 RMenu:Delete(RMenu:Get(cat, subCat("setGroup")))
                 RMenu:Delete(RMenu:Get(cat, subCat("items")))

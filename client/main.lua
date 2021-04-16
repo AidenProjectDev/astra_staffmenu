@@ -1,6 +1,7 @@
 isNoClip,NoClipSpeed,isNameShown = false,0.5,false
 spawnInside = false
 selectedPlayer = nil
+selectedReport = nil
 
 localPlayers, connecteds, staff, items = {},0,0, {}
 permLevel = nil
