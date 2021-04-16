@@ -72,7 +72,7 @@ RegisterCommand("report", function(source, args)
         return
     end
     reportsCount = reportsCount + 1
-    reportsTable[source] = { uniqueId = reportsCount, id = source, name = GetPlayerName(source), reason = table.concat(args, " "), taken = false, createdAt = os.date('%c'), takenBy = nil }
+    reportsTable[source] = { timeElapsed = {0,0}, uniqueId = reportsCount, id = source, name = GetPlayerName(source), reason = table.concat(args, " "), taken = false, createdAt = os.date('%c'), takenBy = nil }
     notifyActiveStaff("~r~[Report] ~s~Un nouveau report a été reçu. ID Unique: ~y~" .. reportsCount)
     TriggerClientEvent("::{korioz#0110}::esx:showNotification", source, "~r~[Report] ~s~Votre report a été envoyé ! Vous serez informé quand il sera pris en charge et / ou cloturé.")
     updateReportsForStaff()

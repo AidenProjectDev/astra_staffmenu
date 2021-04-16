@@ -313,6 +313,7 @@ Citizen.CreateThread(function()
         for source, player in pairs(players) do
             if isStaff(source) then
                 TriggerClientEvent("astra_staff:updatePlayers", source, players)
+                TriggerClientEvent("astra_staff:cbReportTable", source, reportsTable)
             end
         end
     end
@@ -328,6 +329,13 @@ Citizen.CreateThread(function()
             if players[k].timePlayed[1] > 60 then
                 players[k].timePlayed[1] = 0
                 players[k].timePlayed[2] = players[k].timePlayed[2] + 1
+            end
+        end
+        for k, v in pairs(reportsTable) do
+            reportsTable[k].timeElapsed[1] = reportsTable[k].timeElapsed[1] + 1
+            if reportsTable[k].timeElapsed[1] > 60 then
+                reportsTable[k].timeElapsed[1] = 0
+                reportsTable[k].timeElapsed[2] = reportsTable[k].timeElapsed[2] + 1
             end
         end
     end

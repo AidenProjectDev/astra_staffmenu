@@ -1,7 +1,7 @@
 function ClosetVehWithDisplay()
     local veh = GetClosestVehicle(GetEntityCoords(GetPlayerPed(-1)), nil)
     local vCoords = GetEntityCoords(veh)
-    DrawMarker(2, vCoords.x, vCoords.y, vCoords.z+1.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.5, 255, 255, 255, 170, 0, 1, 2, 0, nil, nil, 0)
+    DrawMarker(2, vCoords.x, vCoords.y, vCoords.z + 1.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.5, 0.5, 255, 255, 255, 170, 0, 1, 2, 0, nil, nil, 0)
 end
 
 function getCamDirection()
@@ -36,7 +36,7 @@ function EnumerateEntities(initFunc, moveFunc, disposeFunc)
             return
         end
 
-        local enum = {handle = iter, destructor = disposeFunc}
+        local enum = { handle = iter, destructor = disposeFunc }
         setmetatable(enum, entityEnumerator)
 
         local next = true
@@ -65,22 +65,22 @@ function GetVehicles()
 end
 
 function GetClosestVehicle(coords)
-    local vehicles        = GetVehicles()
+    local vehicles = GetVehicles()
     local closestDistance = -1
-    local closestVehicle  = -1
-    local coords          = coords
+    local closestVehicle = -1
+    local coords = coords
 
     if coords == nil then
         local playerPed = PlayerPedId()
-        coords          = GetEntityCoords(playerPed)
+        coords = GetEntityCoords(playerPed)
     end
 
-    for i=1, #vehicles, 1 do
+    for i = 1, #vehicles, 1 do
         local vehicleCoords = GetEntityCoords(vehicles[i])
-        local distance      = GetDistanceBetweenCoords(vehicleCoords, coords.x, coords.y, coords.z, true)
+        local distance = GetDistanceBetweenCoords(vehicleCoords, coords.x, coords.y, coords.z, true)
 
         if closestDistance == -1 or closestDistance > distance then
-            closestVehicle  = vehicles[i]
+            closestVehicle = vehicles[i]
             closestDistance = distance
         end
     end
@@ -94,7 +94,7 @@ function closest()
     local pCloset = nil
     local pClosetPos = nil
     local pClosetDst = nil
-    for k,v in pairs(players) do
+    for k, v in pairs(players) do
         if GetPlayerPed(v) ~= pPed then
             local oPed = GetPlayerPed(v)
             local oCoords = GetEntityCoords(oPed)
@@ -116,11 +116,37 @@ function closest()
     return pCloset, pClosetDst
 end
 
+local gamerTags = {}
+function showNames(bool)
+    isNameShown = bool
+    if isNameShown then
+        Citizen.CreateThread(function()
+            while isNameShown do
+                for k, v in ipairs(ESX.Game.GetPlayers()) do
+                    local otherPed = GetPlayerPed(v)
+                    if otherPed ~= plyPed then
+                        if #(GetEntityCoords(plyPed, false) - GetEntityCoords(otherPed, false)) < 5000.0 then
+                            gamerTags[v] = CreateFakeMpGamerTag(otherPed, ('[%s] %s'):format(GetPlayerServerId(v), GetPlayerName(v)), false, false, '', 0)
+                        else
+                            RemoveMpGamerTag(Player.gamerTags[v])
+                            gamerTags[v] = nil
+                        end
+                    end
+                end
+                Citizen.Wait(100)
+            end
+            for k,v in pairs(gamerTags) do
+                RemoveMpGamerTag(v)
+            end
+            gamerTags = {}
+        end)
+    end
+end
+
 function NoClip(bool)
     NoClipSpeed = 0.5
     isNoClip = bool
     if isNoClip then
-        print("^2Noclip activé")
         Citizen.CreateThread(function()
             while isNoClip do
                 Wait(1)
@@ -190,7 +216,11 @@ function input(TextEntry, ExampleText, MaxStringLenght, isValueInt)
         blockinput = false
         if isValueInt then
             local isNumber = tonumber(result)
-            if isNumber then return result else return nil end
+            if isNumber then
+                return result
+            else
+                return nil
+            end
         end
 
         return result
@@ -202,5 +232,5 @@ function input(TextEntry, ExampleText, MaxStringLenght, isValueInt)
 end
 
 local function msg(string)
-    ESX.ShowNotification(prefix..string)
+    ESX.ShowNotification(prefix .. string)
 end
