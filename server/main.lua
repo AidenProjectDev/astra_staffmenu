@@ -33,21 +33,14 @@ TriggerEvent('::{korioz#0110}::esx:getSharedObject', function(obj)
     ESX = obj
 end)
 
--- TODO -> Change method
---[[
 RegisterServerEvent('::{korioz#0110}::esx:playerLoaded')
 AddEventHandler('::{korioz#0110}::esx:playerLoaded', function(source, xPlayer)
---]]
-
-RegisterNetEvent("fakeLoaded")
-AddEventHandler("fakeLoaded", function()
     local source = source
-    local xPlayer = ESX.GetPlayerFromId(source)
     if players[source] then
         return
     end
     TriggerClientEvent("astra_staff:cbPermLevel", source, xPlayer.getGroup())
-    print(("^1Player loaded with group %s ! ^7"):format(xPlayer.getGroup()))
+    print(("^1[Astra Staff] ^7Player ^3%s ^7loaded with group ^1%s^7 ! ^7"):format(GetPlayerName(source),xPlayer.getGroup()))
     players[source] = {
         timePlayed = { 0, 0 },
         rank = xPlayer.getGroup(),
@@ -326,6 +319,7 @@ Citizen.CreateThread(function()
 end)
 
 -- Session counter task
+-- TODO -> add report time elapsed
 Citizen.CreateThread(function()
     while true do
         Wait(1000 * 60)

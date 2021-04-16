@@ -203,8 +203,7 @@ function openMenu()
                 statsSeparator()
                 RageUI.Separator("↓ ~g~Joueurs ~s~↓")
                 for source, player in pairs(localPlayers) do
-                    --RageUI.ButtonWithStyle(getRankDisplay(player.rank).."~s~[~o~"..source.."~s~] "..cVarLong().."→ ~s~"..player.name.." (~b~"..player.timePlayed[2].."h "..player.timePlayed[1].."min~s~)", nil, {RightLabel = "→→"}, source ~= GetPlayerServerId(PlayerId()) and ranksRelative[localPlayers[GetPlayerServerId(PlayerId())]] > ranksRelative[player.rank], function(_,_,s)
-                    RageUI.ButtonWithStyle(getRankDisplay(player.rank) .. "~s~[~o~" .. source .. "~s~] " .. cVarLong() .. "→ ~s~" .. player.name .. " (~b~" .. player.timePlayed[2] .. "h " .. player.timePlayed[1] .. "min~s~)", nil, { RightLabel = "→→" }, true, function(_, _, s)
+                    RageUI.ButtonWithStyle(getRankDisplay(player.rank) .. "~s~[~o~" .. source .. "~s~] " .. cVarLong() .. "→ ~s~" .. player.name .. " (~b~" .. player.timePlayed[2] .. "h " .. player.timePlayed[1] .. "min~s~)", nil, { RightLabel = "→→" }, ranksRelative[permLevel] >= ranksRelative[player.rank] and source ~= GetPlayerServerId(PlayerId()), function(_, _, s)
                         if s then
                             selectedPlayer = source
                         end
