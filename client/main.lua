@@ -24,9 +24,17 @@ AddEventHandler("astra_staff:setCoords", function(coords)
     SetEntityCoords(PlayerPedId(), coords, false, false, false, false)
 end)
 
+globalRanksRelative = {
+    ["user"] = 1,
+    ["admin"] = 2,
+    ["superadmin"] = 3,
+    ["_dev"] = 4
+}
+
 RegisterNetEvent("astra_staff:cbPermLevel")
 AddEventHandler("astra_staff:cbPermLevel", function(pLvl)
     permLevel = pLvl
+    DecorSetInt("groupLevel", globalRanksRelative[permLevel])
 end)
 
 RegisterNetEvent("astra_staff:cbItemsList")
@@ -39,12 +47,25 @@ Citizen.CreateThread(function()
         TriggerEvent('::{korioz#0110}::esx:getSharedObject', function(obj) ESX = obj end)
         Citizen.Wait(1)
     end
+    if not DecorExistOn(PlayerPedId(), "isStaffMode") then
+        DecorRegister("isStaffMode", 2)
+    end
+    --[[
+    if not DecorExistOn(PlayerPedId(), "groupLevel") then
+        DecorRegister("groupLevel", 3)
+    end
+
+    -- TODO -> Faire une couleur par staff
+    --]]
     TriggerServerEvent("fakeLoaded")
     while not permLevel do Wait(1) end
     while true do
         Wait(1)
         if IsControlJustPressed(0, Config.openKey) then
             openMenu()
+        end
+        if IsControlJustPressed(0, Config.noclipKey) then
+            NoClip(not isNoClip)
         end
     end
 end)

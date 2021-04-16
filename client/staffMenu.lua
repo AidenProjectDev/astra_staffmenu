@@ -265,14 +265,14 @@ function openMenu()
                         end
                     end)
                     RageUI.Separator("↓ ~y~Actions rapides ~s~↓")
-                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Revive", "~y~Description~s~: " .. infos.reason, { RightLabel = "→→" }, canUse("revive", localPlayers[selectedReport].rank), function(_, _, s)
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Revive", "~y~Description~s~: " .. infos.reason, { RightLabel = "→→" }, canUse("revive", permLevel), function(_, _, s)
                         if s then
                             ESX.ShowNotification("~y~Revive du joueur en cours...")
                             TriggerServerEvent("astra_staff:revive", selectedReport)
                         end
                     end)
 
-                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Soigner", "~y~Description~s~: " .. infos.reason, { RightLabel = "→→" }, canUse("revive", localPlayers[selectedReport].rank), function(_, _, s)
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Soigner", "~y~Description~s~: " .. infos.reason, { RightLabel = "→→" }, canUse("revive", permLevel), function(_, _, s)
                         if s then
                             ESX.ShowNotification("~y~Heal du joueur en cours...")
                             TriggerServerEvent("astra_staff:heal", selectedReport)
@@ -290,14 +290,14 @@ function openMenu()
                         end
                     end)
 
-                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~TP Parking Central", "~y~Description~s~: " .. infos.reason, { RightLabel = "→→" }, canUse("tppc", localPlayers[selectedReport].rank), function(_, _, s)
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~TP Parking Central", "~y~Description~s~: " .. infos.reason, { RightLabel = "→→" }, canUse("tppc", permLevel), function(_, _, s)
                         if s then
                             ESX.ShowNotification("~y~Téléportation du joueur en cours...")
                             TriggerServerEvent("astra_staff:tppc", selectedReport)
                         end
                     end)
 
-                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~y~Actions avancées", "~y~Description~s~: " .. infos.reason.."~n~~r~Attention~s~: Cette action vous fera changer de menu", { RightLabel = "→→" }, canUse("tppc", localPlayers[selectedReport].rank), function(_, _, s)
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~y~Actions avancées", "~y~Description~s~: " .. infos.reason.."~n~~r~Attention~s~: Cette action vous fera changer de menu", { RightLabel = "→→" }, GetPlayerServerId(PlayerId()) ~= selectedReport, function(_, _, s)
                         if s then
                             selectedPlayer = selectedReport
                         end
@@ -331,7 +331,7 @@ function openMenu()
                         end
                     end)
                     RageUI.Separator("↓ ~y~Modération ~s~↓")
-                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Message", nil, { RightLabel = "→→" }, canUse("mess", localPlayers[selectedPlayer].rank), function(_, _, s)
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Message", nil, { RightLabel = "→→" }, canUse("mess", permLevel), function(_, _, s)
                         if s then
                             local reason = input("Message", "", 100, false)
                             if reason ~= nil and reason ~= "" then
@@ -340,7 +340,7 @@ function openMenu()
                             end
                         end
                     end)
-                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Kick", nil, { RightLabel = "→→" }, canUse("kick", localPlayers[selectedPlayer].rank), function(_, _, s)
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Kick", nil, { RightLabel = "→→" }, canUse("kick", permLevel), function(_, _, s)
                         if s then
                             local reason = input("Raison", "", 80, false)
                             if reason ~= nil and reason ~= "" then
@@ -349,7 +349,7 @@ function openMenu()
                             end
                         end
                     end)
-                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Bannir", nil, { RightLabel = "→→" }, canUse("ban", localPlayers[selectedPlayer].rank), function(_, _, s)
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Bannir", nil, { RightLabel = "→→" }, canUse("ban", permLevel), function(_, _, s)
                         if s then
                             local days = input("Durée du banissement (en heures)", "", 20, true)
                             if days ~= nil then
@@ -361,25 +361,25 @@ function openMenu()
                             end
                         end
                     end)
-                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Changer le groupe", nil, { RightLabel = "→→" }, canUse("setGroup", localPlayers[selectedPlayer].rank), function(_, _, s)
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Changer le groupe", nil, { RightLabel = "→→" }, canUse("setGroup", permLevel), function(_, _, s)
                     end, RMenu:Get(cat, subCat("setGroup")))
                     RageUI.Separator("↓ ~o~Personnage ~s~↓")
 
-                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Revive", nil, { RightLabel = "→→" }, canUse("revive", localPlayers[selectedPlayer].rank), function(_, _, s)
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Revive", nil, { RightLabel = "→→" }, canUse("revive", permLevel), function(_, _, s)
                         if s then
                             ESX.ShowNotification("~y~Revive du joueur en cours...")
                             TriggerServerEvent("astra_staff:revive", selectedPlayer)
                         end
                     end)
 
-                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Soigner", nil, { RightLabel = "→→" }, canUse("revive", localPlayers[selectedPlayer].rank), function(_, _, s)
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Soigner", nil, { RightLabel = "→→" }, canUse("revive", permLevel), function(_, _, s)
                         if s then
                             ESX.ShowNotification("~y~Heal du joueur en cours...")
                             TriggerServerEvent("astra_staff:heal", selectedPlayer)
                         end
                     end)
 
-                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Donner un véhicule", nil, { RightLabel = "→→" }, canUse("vehicles", localPlayers[selectedPlayer].rank), function(Hovered, Active, Selected)
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Donner un véhicule", nil, { RightLabel = "→→" }, canUse("vehicles", permLevel), function(Hovered, Active, Selected)
                         if Selected then
                             local veh = CustomString()
                             if veh ~= nil then
@@ -397,23 +397,23 @@ function openMenu()
                         end
                     end)
 
-                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Clear inventaire", nil, { RightLabel = "→→" }, canUse("clearInventory", localPlayers[selectedPlayer].rank), function(_, _, s)
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Clear inventaire", nil, { RightLabel = "→→" }, canUse("clearInventory", permLevel), function(_, _, s)
                         if s then
                             ESX.ShowNotification("~y~Clear de l'inventaire du joueur en cours...")
                             TriggerServerEvent("astra_staff:clearInv", selectedPlayer)
                         end
                     end)
-                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Clear armes", nil, { RightLabel = "→→" }, canUse("clearLoadout", localPlayers[selectedPlayer].rank), function(_, _, s)
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Clear armes", nil, { RightLabel = "→→" }, canUse("clearLoadout", permLevel), function(_, _, s)
                         if s then
                             ESX.ShowNotification("~y~Clear des armes du joueur en cours...")
                             TriggerServerEvent("astra_staff:clearLoadout", selectedPlayer)
                         end
                     end)
 
-                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Give un item", nil, { RightLabel = "→→" }, canUse("give", localPlayers[selectedPlayer].rank), function(_, _, s)
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Give un item", nil, { RightLabel = "→→" }, canUse("give", permLevel), function(_, _, s)
                     end, RMenu:Get(cat, subCat("items")))
 
-                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Give de l'argent (~g~liquide~s~)", nil, { RightLabel = "→→" }, canUse("giveMoney", localPlayers[selectedPlayer].rank), function(_, _, s)
+                    RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Give de l'argent (~g~liquide~s~)", nil, { RightLabel = "→→" }, canUse("giveMoney", permLevel), function(_, _, s)
                         if s then
                             local qty = input("Quantité", "", 20, true)
                             if qty ~= nil then

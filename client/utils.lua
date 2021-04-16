@@ -122,13 +122,24 @@ function showNames(bool)
     if isNameShown then
         Citizen.CreateThread(function()
             while isNameShown do
+                local plyPed = PlayerPedId()
                 for k, v in ipairs(ESX.Game.GetPlayers()) do
                     local otherPed = GetPlayerPed(v)
                     if otherPed ~= plyPed then
                         if #(GetEntityCoords(plyPed, false) - GetEntityCoords(otherPed, false)) < 5000.0 then
-                            gamerTags[v] = CreateFakeMpGamerTag(otherPed, ('[%s] %s'):format(GetPlayerServerId(v), GetPlayerName(v)), false, false, '', 0)
+                            if not DecorExistOn(otherPed, "") then
+                                gamerTags[v] = CreateFakeMpGamerTag(otherPed, ('[%s] %s'):format(GetPlayerServerId(v), GetPlayerName(v)), false, false, '', 0)
+                            else
+                                local isStaff = DecorGetBool(otherPed, "isStaffMode")
+                                if isStaff then
+                                    gamerTags[v] = CreateFakeMpGamerTag(otherPed, ('(StaffMode) [%s] %s'):format(GetPlayerServerId(v), GetPlayerName(v)), false, false, '', 0)
+                                    SetMpGamerTagColour(gamerTags[v], 0, 50)
+                                else
+                                    gamerTags[v] = CreateFakeMpGamerTag(otherPed, ('[%s] %s'):format(GetPlayerServerId(v), GetPlayerName(v)), false, false, '', 0)
+                                end
+                            end
                         else
-                            RemoveMpGamerTag(Player.gamerTags[v])
+                            RemoveMpGamerTag(gamerTags[v])
                             gamerTags[v] = nil
                         end
                     end
@@ -144,6 +155,12 @@ function showNames(bool)
 end
 
 function NoClip(bool)
+    if permLevel == "user" then
+        return
+    end
+    if not isStaffMode then
+        ESX.ShowNotification("~r~[Staff] ~s~Vous devez avoir le staff mode activé pour faire cela !")
+    end
     NoClipSpeed = 0.5
     isNoClip = bool
     if isNoClip then

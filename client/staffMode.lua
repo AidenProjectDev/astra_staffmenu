@@ -4,6 +4,7 @@ RegisterNetEvent("astra_staff:cbStaffState")
 AddEventHandler("astra_staff:cbStaffState", function(isStaff)
     isStaffMode = isStaff
     serverInteraction = false
+    DecorSetBool(PlayerPedId(), "isStaffMode", isStaffMode)
     if isStaffMode then
         local cVar1 = "~r~"
         local cVar2 = "/\\"
@@ -27,5 +28,6 @@ AddEventHandler("astra_staff:cbStaffState", function(isStaff)
         end)
     else
         NoClip(false)
+        showNames(false)
     end
 end)
