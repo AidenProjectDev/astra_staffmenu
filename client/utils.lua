@@ -127,16 +127,15 @@ function showNames(bool)
                     local otherPed = GetPlayerPed(v)
                     if otherPed ~= plyPed then
                         if #(GetEntityCoords(plyPed, false) - GetEntityCoords(otherPed, false)) < 5000.0 then
-                            if not DecorExistOn(otherPed, "") then
-                                gamerTags[v] = CreateFakeMpGamerTag(otherPed, ('[%s] %s'):format(GetPlayerServerId(v), GetPlayerName(v)), false, false, '', 0)
+                            gamerTags[v] = CreateFakeMpGamerTag(otherPed, ('[%s] %s'):format(GetPlayerServerId(v), GetPlayerName(v)), false, false, '', 0)
+                            SetMpGamerTagVisibility(gamerTags[v], 4, true)
+                            SetMpGamerTagAlpha(gamerTags[v], 4, 255)
+                            if NetworkIsPlayerTalking(v) then
+                                SetMpGamerTagColour(gamerTags[v], 0, 211)
+                                SetMpGamerTagColour(gamerTags[v], 4, 211)
                             else
-                                local isStaff = DecorGetBool(otherPed, "isStaffMode")
-                                if isStaff then
-                                    gamerTags[v] = CreateFakeMpGamerTag(otherPed, ('(StaffMode) [%s] %s'):format(GetPlayerServerId(v), GetPlayerName(v)), false, false, '', 0)
-                                    SetMpGamerTagColour(gamerTags[v], 0, 50)
-                                else
-                                    gamerTags[v] = CreateFakeMpGamerTag(otherPed, ('[%s] %s'):format(GetPlayerServerId(v), GetPlayerName(v)), false, false, '', 0)
-                                end
+                                SetMpGamerTagColour(gamerTags[v], 0, 0)
+                                SetMpGamerTagColour(gamerTags[v], 4, 0)
                             end
                         else
                             RemoveMpGamerTag(gamerTags[v])
