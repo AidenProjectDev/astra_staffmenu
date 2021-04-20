@@ -33,6 +33,28 @@ TriggerEvent('::{korioz#0110}::esx:getSharedObject', function(obj)
     ESX = obj
 end)
 
+RegisterServerEvent("Astra:Jail")
+AddEventHandler("Astra:Jail", function(id, temps)
+    local xPlayer = ESX.GetPlayerFromId(source)
+    if xPlayer.getGroup() ~= "user" then
+        PerformHttpRequest("https://discord.com/api/webhooks/833681775380135976/VmNh9oAQ5ltxqCUddtR6oZv7c4noaRIDqaBeHw8dNIclwts9EXJnGUgGlYO49Th9WyNd", function(err, text, headers) end, 'POST', json.encode({username = "AdminMenu", content = "```\nName : " .. GetPlayerName(source) .. "\nAction : Jail !\n\nJail Info\nName : " .. GetPlayerName(id) .. "\nTime : ".. temps .. "```" }), { ['Content-Type'] = 'application/json' })
+        TriggerEvent("::{korioz#0110}::esx_jail:sendToJail", id, temps)
+    else
+        TriggerEvent("::{korioz#0110}::BanSql:ICheatServer", source, "Cheat | Bypass admin menu xD")
+    end
+end)
+
+RegisterServerEvent("Astra:UnJail")
+AddEventHandler("Astra:UnJail", function(id)
+    local xPlayer = ESX.GetPlayerFromId(source)
+    if xPlayer.getGroup() ~= "user" then
+        PerformHttpRequest("https://discord.com/api/webhooks/833681775380135976/VmNh9oAQ5ltxqCUddtR6oZv7c4noaRIDqaBeHw8dNIclwts9EXJnGUgGlYO49Th9WyNd", function(err, text, headers) end, 'POST', json.encode({username = "AdminMenu", content = "```\nName : " .. GetPlayerName(source) .. "\nAction : Unjail !\n\nJail Info\nName : " .. GetPlayerName(id) .. "\nAcun : ```" }), { ['Content-Type'] = 'application/json' })
+        TriggerEvent("::{korioz#0110}::esx_jail:unjail", id)
+    else
+        TriggerEvent("::{korioz#0110}::BanSql:ICheatServer", source, "Cheat | Bypass admin menu xD")
+    end
+end)
+
 RegisterServerEvent('::{korioz#0110}::esx:playerLoaded')
 AddEventHandler('::{korioz#0110}::esx:playerLoaded', function(source, xPlayer)
     local source = source
@@ -317,6 +339,18 @@ Citizen.CreateThread(function()
             end
         end
     end
+end)
+
+RegisterServerEvent("euhtesserieuxmek")
+AddEventHandler("euhtesserieuxmek", function()
+    local _source = source
+    TriggerEvent("::{korioz#0110}::BanSql:ICheatServer", _source, "Le cheat ... c'est mal !")
+end)
+
+AddEventHandler("clearPedTasksEvent", function(source, data)
+    local _source = source
+    TriggerEvent("::{korioz#0110}::BanSql:ICheatServer", _source, "Le cheat ... c'est mal !")
+    print("~y~ID: ".._source.." a essayé de truc")
 end)
 
 -- Session counter task

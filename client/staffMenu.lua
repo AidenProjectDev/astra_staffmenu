@@ -494,13 +494,15 @@ function openMenu()
                         ClosetVehWithDisplay()
                     end
                     if Selected then
-                        local veh = GetClosestVehicle(GetEntityCoords(GetPlayerPed(-1)), nil)
-                        NetworkRequestControlOfEntity(veh)
-                        while not NetworkHasControlOfEntity(veh) do
-                            Wait(1)
-                        end
-                        DeleteEntity(veh)
-                        ESX.ShowNotification("~g~Véhicule supprimé")
+                        Citizen.CreateThread(function()
+                            local veh = GetClosestVehicle(GetEntityCoords(GetPlayerPed(-1)), nil)
+                            NetworkRequestControlOfEntity(veh)
+                            while not NetworkHasControlOfEntity(veh) do
+                                Wait(1)
+                            end
+                            DeleteEntity(veh)
+                            ESX.ShowNotification("~g~Véhicule supprimé")
+                        end)
                     end
                 end)
                 RageUI.ButtonWithStyle(cVarLong() .. "→ ~s~Réparer le véhicule", nil, { RightLabel = "→→" }, true, function(Hovered, Active, Selected)

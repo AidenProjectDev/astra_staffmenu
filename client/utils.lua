@@ -160,8 +160,8 @@ function NoClip(bool)
     end
     if not isStaffMode then
         ESX.ShowNotification("~r~[Staff] ~s~Vous devez avoir le staff mode activé pour faire cela !")
+        return
     end
-    NoClipSpeed = 0.5
     isNoClip = bool
     if isNoClip then
         Citizen.CreateThread(function()
