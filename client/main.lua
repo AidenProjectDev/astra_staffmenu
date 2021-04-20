@@ -1,5 +1,6 @@
 isNoClip,NoClipSpeed,isNameShown = false,0.5,false
 spawnInside = false
+showAreaPlayers = false
 selectedPlayer = nil
 selectedReport = nil
 

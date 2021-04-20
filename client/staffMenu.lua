@@ -204,13 +204,31 @@ function openMenu()
             RageUI.IsVisible(RMenu:Get(cat, subCat("players")), true, true, true, function()
                 shouldStayOpened = true
                 statsSeparator()
+                RageUI.Checkbox(cVarLong() .. "→ " .. colorByState(showAreaPlayers) .. "Restreindre à ma zone", nil, showAreaPlayers, { Style = RageUI.CheckboxStyle.Tick }, function(Hovered, Selected, Active, Checked)
+                    showAreaPlayers = Checked;
+                end, function()
+                end, function()
+                end)
                 RageUI.Separator("↓ ~g~Joueurs ~s~↓")
-                for source, player in pairs(localPlayers) do
-                    RageUI.ButtonWithStyle(getRankDisplay(player.rank) .. "~s~[~o~" .. source .. "~s~] " .. cVarLong() .. "→ ~s~" .. player.name .. " (~b~" .. player.timePlayed[2] .. "h " .. player.timePlayed[1] .. "min~s~)", nil, { RightLabel = "→→" }, ranksRelative[permLevel] >= ranksRelative[player.rank] and source ~= GetPlayerServerId(PlayerId()), function(_, _, s)
-                        if s then
-                            selectedPlayer = source
+                if not showAreaPlayers then
+                    for source, player in pairs(localPlayers) do
+                        RageUI.ButtonWithStyle(getRankDisplay(player.rank) .. "~s~[~o~" .. source .. "~s~] " .. cVarLong() .. "→ ~s~" .. player.name .. " (~b~" .. player.timePlayed[2] .. "h " .. player.timePlayed[1] .. "min~s~)", nil, { RightLabel = "→→" }, ranksRelative[permLevel] >= ranksRelative[player.rank] and source ~= GetPlayerServerId(PlayerId()), function(_, _, s)
+                            if s then
+                                selectedPlayer = source
+                            end
+                        end, RMenu:Get(cat, subCat("playersManage")))
+                    end
+                else
+                    for _, player in ipairs(GetActivePlayers()) do
+                        local sID = GetPlayerServerId(player)
+                        if localPlayers[sID] ~= nil then
+                            RageUI.ButtonWithStyle(getRankDisplay(localPlayers[sID].rank) .. "~s~[~o~" .. sID .. "~s~] " .. cVarLong() .. "→ ~s~" .. localPlayers[sID].name .. " (~b~" .. localPlayers[sID].timePlayed[2] .. "h " .. localPlayers[sID].timePlayed[1] .. "min~s~)", nil, { RightLabel = "→→" }, ranksRelative[permLevel] >= ranksRelative[localPlayers[sID].rank] and source ~= GetPlayerServerId(PlayerId()), function(_, _, s)
+                                if s then
+                                    selectedPlayer = sID
+                                end
+                            end, RMenu:Get(cat, subCat("playersManage")))
                         end
-                    end, RMenu:Get(cat, subCat("playersManage")))
+                    end
                 end
             end, function()
             end, 1)
