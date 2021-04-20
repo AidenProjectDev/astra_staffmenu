@@ -128,14 +128,11 @@ function showNames(bool)
                     if otherPed ~= plyPed then
                         if #(GetEntityCoords(plyPed, false) - GetEntityCoords(otherPed, false)) < 5000.0 then
                             gamerTags[v] = CreateFakeMpGamerTag(otherPed, ('[%s] %s'):format(GetPlayerServerId(v), GetPlayerName(v)), false, false, '', 0)
-                            SetMpGamerTagVisibility(gamerTags[v], 4, true)
-                            SetMpGamerTagAlpha(gamerTags[v], 4, 255)
-                            if NetworkIsPlayerTalking(v) then
+                            if NetworkIsPlayerTalking(otherPed) then
+                                SetMpGamerTagVisibility(gamerTags[v], 4, true)
+                                SetMpGamerTagAlpha(gamerTags[v], 4, 255)
+                                SetMpGamerTagColour(gamerTags[v], 4, 211
                                 SetMpGamerTagColour(gamerTags[v], 0, 211)
-                                SetMpGamerTagColour(gamerTags[v], 4, 211)
-                            else
-                                SetMpGamerTagColour(gamerTags[v], 0, 0)
-                                SetMpGamerTagColour(gamerTags[v], 4, 0)
                             end
                         else
                             RemoveMpGamerTag(gamerTags[v])
