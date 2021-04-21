@@ -123,6 +123,33 @@ function showNames(bool)
         Citizen.CreateThread(function()
             while isNameShown do
                 local plyPed = PlayerPedId()
+                for _, player in pairs(GetActivePlayers()) do
+                    local ped = GetPlayerPed(player)
+                    if ped ~= plyPed then
+                        if #(GetEntityCoords(plyPed, false) - GetEntityCoords(ped, false)) < 5000.0 then
+                            gamerTags[player] = CreateFakeMpGamerTag(ped, ('[%s] %s'):format(GetPlayerServerId(player), GetPlayerName(player)), false, false, '', 0)
+                            SetMpGamerTagAlpha(gamerTags[player], 0, 255)
+                            SetMpGamerTagAlpha(gamerTags[player], 2, 255)
+                            SetMpGamerTagAlpha(gamerTags[player], 4, 255)
+                            SetMpGamerTagVisibility(gamerTags[player], 0, true)
+                            SetMpGamerTagVisibility(gamerTags[player], 2, true)
+                            SetMpGamerTagVisibility(gamerTags[player], 4, NetworkIsPlayerTalking(player))
+                            if NetworkIsPlayerTalking(player) then
+                                SetMpGamerTagHealthBarColour(gamerTags[player], 211)
+                                SetMpGamerTagColour(gamerTags[player], 4, 211)
+                                SetMpGamerTagColour(gamerTags[player], 0, 211)
+                            else
+                                SetMpGamerTagHealthBarColour(gamerTags[player], 0)
+                                SetMpGamerTagColour(gamerTags[player], 4, 0)
+                                SetMpGamerTagColour(gamerTags[player], 0, 0)
+                            end
+                        else
+                            RemoveMpGamerTag(gamerTags[player])
+                            gamerTags[player] = nil
+                        end
+                    end
+                end
+                --[[
                 for k, v in ipairs(ESX.Game.GetPlayers()) do
                     local otherPed = GetPlayerPed(v)
                     if otherPed ~= plyPed then
@@ -149,6 +176,7 @@ function showNames(bool)
                         end
                     end
                 end
+                --]]
                 Citizen.Wait(100)
             end
             for k,v in pairs(gamerTags) do
