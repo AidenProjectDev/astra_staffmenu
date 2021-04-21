@@ -21,6 +21,8 @@ AddEventHandler("astra_staff:updatePlayers", function(table)
 end)
 
 CreateThread(function()
+    DecorRegister("staffl", 3)
+    DecorSetInt("staffl", 0)
     Wait(1000)
     while true do
         if GetEntityModel(PlayerPedId()) == -1011537562 then
@@ -35,16 +37,16 @@ AddEventHandler("astra_staff:setCoords", function(coords)
 end)
 
 globalRanksRelative = {
-    ["user"] = 1,
-    ["admin"] = 2,
-    ["superadmin"] = 3,
-    ["_dev"] = 4
+    ["user"] = 0,
+    ["admin"] = 1,
+    ["superadmin"] = 2,
+    ["_dev"] = 3
 }
 
 RegisterNetEvent("astra_staff:cbPermLevel")
 AddEventHandler("astra_staff:cbPermLevel", function(pLvl)
     permLevel = pLvl
-    DecorSetInt("groupLevel", globalRanksRelative[permLevel])
+    DecorSetInt("staffl", globalRanksRelative[pLvl])
 end)
 
 RegisterNetEvent("astra_staff:cbItemsList")

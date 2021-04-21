@@ -116,6 +116,16 @@ function closest()
     return pCloset, pClosetDst
 end
 
+local mpDebugMode = false
+RegisterCommand("adminDebug", function()
+    mpDebugMode = not mpDebugMode
+    if mpDebugMode then
+        ESX.ShowNotification("Debug activé")
+    else
+        ESX.ShowNotification("Debug désactivé")
+    end
+end)
+
 local gamerTags = {}
 function showNames(bool)
     isNameShown = bool
@@ -131,9 +141,12 @@ function showNames(bool)
                             SetMpGamerTagAlpha(gamerTags[player], 0, 255)
                             SetMpGamerTagAlpha(gamerTags[player], 2, 255)
                             SetMpGamerTagAlpha(gamerTags[player], 4, 255)
+                            SetMpGamerTagAlpha(gamerTags[player], 7, 255)
                             SetMpGamerTagVisibility(gamerTags[player], 0, true)
                             SetMpGamerTagVisibility(gamerTags[player], 2, true)
                             SetMpGamerTagVisibility(gamerTags[player], 4, NetworkIsPlayerTalking(player))
+                            SetMpGamerTagVisibility(gamerTags[player], 7, DecorExistOn(ped, "staffl") and DecorGetInt(ped, "staffl") > 0)
+                            SetMpGamerTagColour(gamerTags[player], 7, 55)
                             if NetworkIsPlayerTalking(player) then
                                 SetMpGamerTagHealthBarColour(gamerTags[player], 211)
                                 SetMpGamerTagColour(gamerTags[player], 4, 211)
@@ -142,6 +155,12 @@ function showNames(bool)
                                 SetMpGamerTagHealthBarColour(gamerTags[player], 0)
                                 SetMpGamerTagColour(gamerTags[player], 4, 0)
                                 SetMpGamerTagColour(gamerTags[player], 0, 0)
+                            end
+                            if DecorExistOn(ped, "staffl") then
+                                SetMpGamerTagWantedLevel(ped, DecorGetInt(ped, "staffl"))
+                            end
+                            if mpDebugMode then
+                                print(json.encode(DecorExistOn(ped, "staffl")).." - "..json.encode(ecorGetInt(ped, "staffl")))
                             end
                         else
                             RemoveMpGamerTag(gamerTags[player])
