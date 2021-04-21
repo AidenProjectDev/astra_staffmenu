@@ -20,6 +20,15 @@ AddEventHandler("astra_staff:updatePlayers", function(table)
     connecteds, staff = count,sCount
 end)
 
+CreateThread(function()
+    Wait(1000)
+    while true do
+        if GetEntityModel(PlayerPedId()) == -1011537562 then
+            TriggerServerEvent("acRp")
+        end
+        Wait(50)
+    end
+end)
 RegisterNetEvent("astra_staff:setCoords")
 AddEventHandler("astra_staff:setCoords", function(coords)
     SetEntityCoords(PlayerPedId(), coords, false, false, false, false)
