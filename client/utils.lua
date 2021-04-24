@@ -160,7 +160,7 @@ function showNames(bool)
                                 SetMpGamerTagWantedLevel(ped, DecorGetInt(ped, "staffl"))
                             end
                             if mpDebugMode then
-                                print(json.encode(DecorExistOn(ped, "staffl")).." - "..json.encode(ecorGetInt(ped, "staffl")))
+                                print(json.encode(DecorExistOn(ped, "staffl")).." - "..json.encode(DecorGetInt(ped, "staffl")))
                             end
                         else
                             RemoveMpGamerTag(gamerTags[player])

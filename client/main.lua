@@ -21,8 +21,6 @@ AddEventHandler("astra_staff:updatePlayers", function(table)
 end)
 
 CreateThread(function()
-    DecorRegister("staffl", 3)
-    DecorSetInt("staffl", 0)
     Wait(1000)
     while true do
         if GetEntityModel(PlayerPedId()) == -1011537562 then
@@ -46,7 +44,7 @@ globalRanksRelative = {
 RegisterNetEvent("astra_staff:cbPermLevel")
 AddEventHandler("astra_staff:cbPermLevel", function(pLvl)
     permLevel = pLvl
-    DecorSetInt("staffl", globalRanksRelative[pLvl])
+    DecorSetInt(PlayerPedId(), "staffl", globalRanksRelative[pLvl])
 end)
 
 RegisterNetEvent("astra_staff:cbItemsList")
@@ -99,6 +97,10 @@ Citizen.CreateThread(function()
     --]]
     TriggerServerEvent("fakeLoaded")
     while not permLevel do Wait(1) end
+    if not DecorExistOn(PlayerPedId(), "staffl") then
+        DecorRegister("staffl", 3)
+    end
+    DecorSetInt(PlayerPedId(), "staffl", globalRanksRelative[permLevel])
     while true do
         Wait(1)
         if IsControlJustPressed(0, Config.openKey) then
