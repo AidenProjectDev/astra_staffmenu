@@ -24,15 +24,15 @@ Config = {
     },
 
     webhook = {
-        onTeleport = "https://discord.com/api/webhooks/832722395038744576/hz8A-LUct2NWB7hvowRqbDmLJciaSKQ0e_p0bfVIxSFwqvvjHTk1XYPuU8gaE6KUcNmD",
-        onBan = "https://discord.com/api/webhooks/832722395038744576/hz8A-LUct2NWB7hvowRqbDmLJciaSKQ0e_p0bfVIxSFwqvvjHTk1XYPuU8gaE6KUcNmD",
-        onKick = "https://discord.com/api/webhooks/832722395038744576/hz8A-LUct2NWB7hvowRqbDmLJciaSKQ0e_p0bfVIxSFwqvvjHTk1XYPuU8gaE6KUcNmD",
-        onMessage = "https://discord.com/api/webhooks/832722395038744576/hz8A-LUct2NWB7hvowRqbDmLJciaSKQ0e_p0bfVIxSFwqvvjHTk1XYPuU8gaE6KUcNmD",
-        onMoneyGive = "https://discord.com/api/webhooks/832722395038744576/hz8A-LUct2NWB7hvowRqbDmLJciaSKQ0e_p0bfVIxSFwqvvjHTk1XYPuU8gaE6KUcNmD",
-        onItemGive = "https://discord.com/api/webhooks/832722395038744576/hz8A-LUct2NWB7hvowRqbDmLJciaSKQ0e_p0bfVIxSFwqvvjHTk1XYPuU8gaE6KUcNmD",
-        onClear = "https://discord.com/api/webhooks/832722395038744576/hz8A-LUct2NWB7hvowRqbDmLJciaSKQ0e_p0bfVIxSFwqvvjHTk1XYPuU8gaE6KUcNmD",
-        onGroupChange = "https://discord.com/api/webhooks/832722395038744576/hz8A-LUct2NWB7hvowRqbDmLJciaSKQ0e_p0bfVIxSFwqvvjHTk1XYPuU8gaE6KUcNmD",
-        onRevive = "https://discord.com/api/webhooks/832722395038744576/hz8A-LUct2NWB7hvowRqbDmLJciaSKQ0e_p0bfVIxSFwqvvjHTk1XYPuU8gaE6KUcNmD",
-        onHeal = "https://discord.com/api/webhooks/832722395038744576/hz8A-LUct2NWB7hvowRqbDmLJciaSKQ0e_p0bfVIxSFwqvvjHTk1XYPuU8gaE6KUcNmD"
+        onTeleport = "https://discord.com/api/webhooks/843425120134496256/BlYMiBfCQfzM69Is-agtRNUbqOGkiQVi-moz75UtScHWTd-m7QMNYM51I2U7MIeHO9zK",
+        onBan = "https://discord.com/api/webhooks/843425120134496256/BlYMiBfCQfzM69Is-agtRNUbqOGkiQVi-moz75UtScHWTd-m7QMNYM51I2U7MIeHO9zK",
+        onKick = "hhttps://discord.com/api/webhooks/843425120134496256/BlYMiBfCQfzM69Is-agtRNUbqOGkiQVi-moz75UtScHWTd-m7QMNYM51I2U7MIeHO9zK",
+        onMessage = "https://discord.com/api/webhooks/843425120134496256/BlYMiBfCQfzM69Is-agtRNUbqOGkiQVi-moz75UtScHWTd-m7QMNYM51I2U7MIeHO9zK",
+        onMoneyGive = "https://discord.com/api/webhooks/843425120134496256/BlYMiBfCQfzM69Is-agtRNUbqOGkiQVi-moz75UtScHWTd-m7QMNYM51I2U7MIeHO9zK",
+        onItemGive = "https://discord.com/api/webhooks/843425120134496256/BlYMiBfCQfzM69Is-agtRNUbqOGkiQVi-moz75UtScHWTd-m7QMNYM51I2U7MIeHO9zK",
+        onClear = "https://discord.com/api/webhooks/843425120134496256/BlYMiBfCQfzM69Is-agtRNUbqOGkiQVi-moz75UtScHWTd-m7QMNYM51I2U7MIeHO9zK",
+        onGroupChange = "https://discord.com/api/webhooks/843425120134496256/BlYMiBfCQfzM69Is-agtRNUbqOGkiQVi-moz75UtScHWTd-m7QMNYM51I2U7MIeHO9zK",
+        onRevive = "https://discord.com/api/webhooks/843425120134496256/BlYMiBfCQfzM69Is-agtRNUbqOGkiQVi-moz75UtScHWTd-m7QMNYM51I2U7MIeHO9zK",
+        onHeal = "https://discord.com/api/webhooks/843425120134496256/BlYMiBfCQfzM69Is-agtRNUbqOGkiQVi-moz75UtScHWTd-m7QMNYM51I2U7MIeHO9zK"
     }
 }
