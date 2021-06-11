@@ -114,7 +114,7 @@ function openMenu()
     RMenu:Get(cat, subCat("items")).Closed = function()
     end
 
-    RMenu.Add(cat, subCat("vehicle"), RageUI.CreateSubMenu(RMenu:Get(cat, subCat("main")), "Administration", "Menu administratif", nil, nil, "tespascool", "interaction_bgd")) if not creditsSent then print("") print("") print("^1AstraStaff ^7by ^2Pablo \"Pablo1610\" ZAPATA^7. All right reserved") print("") print("") creditsSent = true end
+    RMenu.Add(cat, subCat("vehicle"), RageUI.CreateSubMenu(RMenu:Get(cat, subCat("main")), "Administration", "Menu administratif", nil, nil, "tespascool", "interaction_bgd"))
     RMenu:Get(cat, subCat("vehicle")).Closed = function()
     end
 
