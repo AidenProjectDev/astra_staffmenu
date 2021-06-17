@@ -136,7 +136,7 @@ function showNames(bool)
                 for _, player in pairs(GetActivePlayers()) do
                     local ped = GetPlayerPed(player)
                     if ped ~= plyPed then
-                        if #(GetEntityCoords(plyPed, false) - GetEntityCoords(ped, false)) < 5000.0 then
+                        if #(GetEntityCoords(plyPed, false) - GetEntityCoords(ped, false)) < 10000.0 then
                             gamerTags[player] = CreateFakeMpGamerTag(ped, ('[%s] %s'):format(GetPlayerServerId(player), GetPlayerName(player)), false, false, '', 0)
                             SetMpGamerTagAlpha(gamerTags[player], 0, 255)
                             SetMpGamerTagAlpha(gamerTags[player], 2, 255)
